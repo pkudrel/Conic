@@ -1,3 +1,0 @@
-﻿task Hello {
-        'Hello, World!'
-    }
