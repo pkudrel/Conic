@@ -14,7 +14,7 @@ How to marge this repository as a subtree?
 # init
 git remote add -f  ps-auto-helpers https://github.com/pkudrel/PsAutomationHelpers.git
 git merge -s ours --no-commit  ps-auto-helpers/master
-git read-tree --prefix=src/build -u ps-auto-helpers/master
+git read-tree --prefix=src/build/ -u ps-auto-helpers/master
 git commit -m "Subtree merged"
 
 # update 
