@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+
+<package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <id>Conic</id>
+    <version>{Version}</version>
+    <authors>Piotr Kudrel</authors>
+    <owners>Piotr Kudrel</owners>
+    <licenseUrl>https://github.com/pkudrel/Conic/blob/production/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/pkudrel/Conic</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/pkudrel/Conic/production/misc/gfx/conic-white-bkg.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Conic allows to create connection between chrome extension and native windows application using named pipes</description>
+    <tags>chrome named pipe</tags>
+  </metadata>
+</package>

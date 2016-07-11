@@ -1,0 +1,36 @@
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+obj
+bin
+*.user
+*.suo
+*.orig
+output
+publish-*
+packages
+_ReSharper.*
+_dotCover.*
+*.Resharper
+*.Cache
+*.cache
+~$*
+[Pp]ublish
+*.ide
+*nunit.TestResult.*.xml
+*.vsp
+
+# Visual Studio build objects
+bin/
+csx/
+obj/
+rcf/
+.vs/
+
+/stuff/*
+/.local/*
+/build-output/*
+/.config/build-counter.txt
+/work-dir/*
+build-out/*

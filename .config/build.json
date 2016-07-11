@@ -1,0 +1,24 @@
+{
+  "ProductName": "Conic",
+  "CompanyName": "DenebLab",
+  "Copyright": "Copyright (c) 2016 Piotr Kudrel, DenebLab",
+  "SemVer": {
+    "major": 1,
+    "minor": 0,
+    "patch": 1,
+    "special": ""
+  },
+  "BuildProjectDirPath": "\\src\\build",
+  "ProjectFile": "\\src\\Conic\\Conic.csproj",
+  "PluginProjectFile": "\\src\\Example\\Conic.Example.ChromeExtension\\Conic.Example.ChromeExtension.csproj",
+  "WinformProjectFile": "\\src\\Example\\Conic.Example.WinForm\\Conic.Example.WinForm.csproj",
+  "SlnFile": "\\src\\Conic.sln",
+  "SrcDir": "\\src",
+  "PackagesDir": "\\src\\packages",
+  "ExampleSlnFile": "\\src\\Example\\Conic.Example.sln",
+  "Libz": "\\src\\packages\\LibZ.Tool\\tools\\libz.exe",
+  "Nuget": "\\tools\\nuget\\nuget.exe",
+  "Zip": "\\tools\\7zip\\7za.exe",
+  "Gitversion": "\\src\\packages\\gitversion.commandline\\tools\\gitversion.exe"
+
+}

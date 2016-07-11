@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conic", "Conic\Conic.csproj", "{4CBB04CB-C234-4234-9C3A-633EB93F9648}"
+EndProject
+Project("{F5034706-568F-408A-B7B3-4D38C6DB8A32}") = "build", "build\build.pssproj", "{6CAFC0C6-A428-4D30-A9F9-700E829FEA51}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".config", ".config", "{5FD683A0-76E7-4740-848D-1498D4D751A0}"
+	ProjectSection(SolutionItems) = preProject
+		..\.config\build.json = ..\.config\build.json
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conic.Tests", "Conic.Tests\Conic.Tests.csproj", "{4879F814-BBB0-40F9-9B9C-AFA7A8A97AB2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Example", "Example", "{2D849969-3DC2-441C-8066-2A21EFB4A8C1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4CBB04CB-C234-4234-9C3A-633EB93F9648}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CBB04CB-C234-4234-9C3A-633EB93F9648}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CBB04CB-C234-4234-9C3A-633EB93F9648}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CBB04CB-C234-4234-9C3A-633EB93F9648}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CAFC0C6-A428-4D30-A9F9-700E829FEA51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CAFC0C6-A428-4D30-A9F9-700E829FEA51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CAFC0C6-A428-4D30-A9F9-700E829FEA51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CAFC0C6-A428-4D30-A9F9-700E829FEA51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4879F814-BBB0-40F9-9B9C-AFA7A8A97AB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4879F814-BBB0-40F9-9B9C-AFA7A8A97AB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4879F814-BBB0-40F9-9B9C-AFA7A8A97AB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4879F814-BBB0-40F9-9B9C-AFA7A8A97AB2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

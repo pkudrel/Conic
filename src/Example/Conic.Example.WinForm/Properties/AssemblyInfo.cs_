@@ -1,0 +1,37 @@
+﻿using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+
+
+
+
+[assembly: AssemblyTitle("Conic.Example.WinForm")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("DenebLab")]
+[assembly: AssemblyProduct("Conic")]
+[assembly: AssemblyCopyright("Copyright (c) 2016 Piotr Kudrel, DenebLab")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+
+
+
+
+[assembly: ComVisible(false)]
+
+
+[assembly: Guid("817f0180-22e9-4870-b834-a9134c566ad9")]
+
+
+
+
+
+
+
+
+
+
+
+[assembly: AssemblyVersion("1.2.340.3")]
+[assembly: AssemblyFileVersion("1.2.340.3")]
+[assembly: AssemblyInformationalVersion("1.2.340.3.production@0a5231fcd8390dca171eb1c2716813c4fa653ebe@2016-06-23T19:35:49+02:00")]

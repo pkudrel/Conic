@@ -1,0 +1,28 @@
+{
+  "manifest_version": 2,
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzJkGXLaHwwwqmq9ekSbJaic8X5Q24e6u+9Y+mb1J0nYiig/35liVaqesodZtihMKcldnguyKB/dEZFmG/csAzHYyfU509EJlJEMEvR/mgRPry5ot7JPMdOwQ7vNl0AKLuYeWcM5BDzhQphAFamOwSAedE5r2S5IaN8Jk9RrmidKBcp0nMLjpTEoysSFXU1dBV4y6a+8DFygMmIkkbtsMymrDSNEmFrajNFBlnjv8/BnSz1czNvW3aesAQfb1ay3aRj4CCO7Mc/R1ot+vS777JeM5HciSj78c9NYQ3mloXGz5mqXqhfS7qI6tlgf20A5Vx8PEc1Noun6S70gfhiwUrwIDAQAB",
+
+  "name": "Conic example",
+  "description": "This extension demonstrates how chrome extension may communicate with native application ",
+  "version": "1.0",
+
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "nativeMessaging",
+    "background"
+  ],
+
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+
+  "browser_action": {
+    "default_icon": "img/icon.png"
+
+  }
+
+
+}
