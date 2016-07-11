@@ -1,0 +1,425 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+</head>
+<body>
+<h1>Invoke-Build Release Notes</h1>
+<h2>v2.14.6</h2>
+<p>Faster preprocessing of special tasks <code>*</code>.</p>
+<p>A new tool <em>New-VSCodeTask.ps1</em> is created. It generates VSCode tasks bound to a specified or default build script tasks and Invoke-Build as a task runner.</p>
+<p><em>Convert-psake.ps1</em></p>
+<ul>
+<li>Preserves original comments and empty lines.</li>
+<li>Adds comments about not supported <code>$psake</code> properties.</li>
+<li>Adds comments about incompatible cases of <code>exec</code>, <code>assert</code>.</li>
+</ul>
+<h2>v2.14.5</h2>
+<ul>
+<li>Revised collections and checks for missing and cyclic tasks.</li>
+<li><code>Invoke-Builds</code> uses engine functions to avoid dupes and #21.</li>
+</ul>
+<h2>v2.14.4</h2>
+<p>Resolved #22, checkpoints are stored before tasks.</p>
+<h2>v2.14.3</h2>
+<p>Improved detection of color support, #21.</p>
+<h2>v2.14.2</h2>
+<p>Fixed #20, persistent builds with cmdlet binding parameters.</p>
+<h2>v2.14.1</h2>
+<p>Tweaks in error processing and satellite tools.</p>
+<h2>v2.14.0</h2>
+<p>Added new command <code>equals</code> (alias of <code>Assert-BuildEquals</code>), mostly for tests. Consider to use <code>equals X Y</code> instead of <code>assert (X -eq Y)</code>. It is simpler, it avoids subtle PowerShell conversions, and its error message is more useful.</p>
+<h2>v2.13.0</h2>
+<p><code>Use-BuildAlias</code>: <code>*</code> is for auto detection of the latest build tools. Example:</p>
+<pre><code>use * MSBuild</code></pre>
+<h2>v2.12.4</h2>
+<p>Fixed #17: <em>After</em> tasks should be added after <em>Before</em> tasks.</p>
+<p>This fix changes the order of added tasks in the following case:</p>
+<pre><code>task Task1                 # task with no own actions
+task After -After Task1    # at first After is added
+task Before -Before Task1  # then Before is added</code></pre>
+<p>After preprocessing the result task had unexpected reference order:</p>
+<pre><code>task Task1 After, Before</code></pre>
+<p>After the fix the order of referenced tasks is changed to expected:</p>
+<pre><code>task Task1 Before, After</code></pre>
+<h2>v2.12.3</h2>
+<ul>
+<li>Fixed #16, the package is marked as <code>developmentDependency</code>.</li>
+<li>Fixed typo in help.</li>
+</ul>
+<h2>v2.12.2</h2>
+<p>Added <code>InformationAction</code> and <code>InformationVariable</code> for v5.</p>
+<h2>v2.12.1</h2>
+<p><a href="https://github.com/nightroman/Invoke-Build/wiki/Dot-Sourcing-Build-Features">Dot Sourcing Build Features</a> allows to specify the build root location.</p>
+<h2>v2.12.0</h2>
+<p>Only the core scripts are left in the package in order to keep it focused on main tasks. Other tools are available at the project repository. A separate package with tools may be created in the future if somebody needs this.</p>
+<p>Excluded <em>Invoke-TaskFromISE.ps1</em>, <em>Show-BuildGraph.ps1</em>, <em>Show-BuildTree.ps1</em> now allow <em>Invoke-Build.ps1</em> to be in the path but at first they still look for it in their directories.</p>
+<p>Added <em>Tasks/Param</em>. It shows how to create several tasks which perform similar actions with some differences depending on parameters.</p>
+<p>Added <em>Tests/Acknowledged.build.ps1</em>, acknowledged issues and various facts.</p>
+<h2>v2.11.1</h2>
+<p>Fixed #12 <code>Write-Warning</code> fails in a <code>trap</code>.</p>
+<h2>v2.11.0</h2>
+<p>This version improves Invoke-Build as a testing engine and slightly improves information shown for normal builds. <strong>Potentially incompatible changes</strong>: if scripts analyse result <code>Errors</code> and <code>Warnings</code> then they should be revised.</p>
+<h4>Aborted builds (Issue #9)</h4>
+<p>When an error happens before a build starts (missing task, cyclic reference, script throws, and etc.) then the build footer shows this as <code>Build ABORTED</code> (i.e. not even started) instead of <code>Build FAILED</code> (i.e. started and failed).</p>
+<h4>Improved result errors (Issue #10)</h4>
+<p>The result <code>Errors</code> list contains objects:</p>
+<ul>
+<li><code>Error</code> - original error record</li>
+<li><code>File</code> - current <code>$BuildFile</code></li>
+<li><code>Task</code> - current <code>$Task</code> or null for non-task errors</li>
+</ul>
+<p>This new information is especially useful in testing:</p>
+<pre><code>Invoke-Build ** -Safe -Result Result
+$Result.Errors [ | Format-List ]</code></pre>
+<p>Use <code>$Result.Errors</code> in order to just list all failures (as above) or produce detailed reports. Error objects now contain enough details.</p>
+<h4>Improved result warnings (Issue #11)</h4>
+<p>The result <code>Warnings</code> list contains objects:</p>
+<ul>
+<li><code>Message</code> - warning message</li>
+<li><code>File</code> - current <code>$BuildFile</code></li>
+<li><code>Task</code> - current <code>$Task</code> or null for non-task warnings</li>
+</ul>
+<p>Build footers as usual show warnings, with task and file now included.</p>
+<h2>v2.10.4</h2>
+<p>Resolved #8. Improved footer messages and result list <code>Errors</code>:</p>
+<ul>
+<li>Avoided duplicated errors.</li>
+<li>Non-task errors are included.</li>
+</ul>
+<h2>v2.10.3</h2>
+<p>Resolved #5. When <code>Safe</code> is used together with the special task <code>**</code> (invoke <code>*.test.ps1</code>) then task failures stop current test scripts, not the whole testing. This change is potentially incompatible, it may alter results of <code>Invoke-Build ** -Safe</code>.</p>
+<h2>v2.10.2</h2>
+<p>Resolved #6. <code>Out-String</code> should not be used by the engine.</p>
+<h2>v2.10.1</h2>
+<p>Fixed incomplete error information when <code>-Safe</code> is used.</p>
+<h2>v2.10.0</h2>
+<p>Invoke-Build features can be imported to normal scripts by dot-sourcing. See <code>help Invoke-Build</code> or <a href="https://github.com/nightroman/Invoke-Build/wiki/Dot-Sourcing-Build-Features">Dot Sourcing Build Features</a>.</p>
+<h2>v2.9.14</h2>
+<p>Minor tweaks in the code and revised help.</p>
+<p>Removed sample <em>Tasks</em> from the package.</p>
+<h2>v2.9.13</h2>
+<ul>
+<li>Documented the issue #4 in help. Namely, dynamic switches must be specified after positional parameters <code>Task</code> and <code>File</code>.</li>
+<li>Corrected parameter positions in <em>Show-BuildGraph.ps1</em>, even though it worked fine, interestingly.</li>
+</ul>
+<h2>v2.9.12</h2>
+<ul>
+<li>Resolved #3 (colored output from remote hosts).</li>
+</ul>
+<h2>v2.9.11</h2>
+<ul>
+<li><em>ib.cmd</em>: corrected #2.</li>
+<li>Help shows default parameter values in a standard way.</li>
+</ul>
+<h2>v2.9.10</h2>
+<p><em>Invoke-TaskFromISE.ps1</em>, <em>Show-BuildGraph.ps1</em>, <em>Show-BuildTree.ps1</em></p>
+<ul>
+<li>They expect <em>Invoke-Build.ps1</em> to be in the same directory. Pros: 1) to be in the path is optional; 2) this approach avoids potential version conflicts.</li>
+</ul>
+<p><em>Show-BuildTree.ps1</em></p>
+<ul>
+<li>It does not show upstream tasks by default, they may look confusing.</li>
+<li>New switch <code>Upstream</code> tells to show upstream tasks for each task.</li>
+</ul>
+<p>Minor inner changes.</p>
+<h2>v2.9.9</h2>
+<ul>
+<li><em>ib.cmd</em> shows help on <code>/?</code></li>
+<li>Custom task <code>file</code> - fixed propagation of the source</li>
+<li>DynamicParam - replaced <code>Get-Variable</code> with <code>$PSBoundParameters</code></li>
+</ul>
+<h2>v2.9.8</h2>
+<p>Users ask for a common cmd.exe helper. I was reluctant for some reasons but now is a good time, perhaps. Here is the proposal based on my own practice.</p>
+<ul>
+<li><em>ib.cmd</em> is the proposed Invoke-Build helper for cmd.exe.</li>
+<li>For similar experience in interactive PowerShell use an alias <code>ib</code>.</li>
+</ul>
+<p>Note that scripts should continue to use the command <code>Invoke-Build</code>. The <code>ib</code> commands should be used with cmd.exe (<em>ib.cmd</em>) and in interactive PowerShell (alias of <em>Invoke-Build.ps1</em> defined in the profile).</p>
+<p>Custom tasks</p>
+<ul>
+<li>Added the sample custom rake-like task <code>file</code>. It is not a big deal but it still may be useful. Besides, it comes with examples of incremental tasks.</li>
+</ul>
+<h2>v2.9.7</h2>
+<p>Task help (<em>experimentally</em>). The <em>Jobs</em> is an array, not a text. With many jobs this avoids dropped <em>Synopsis</em> on default formatting.</p>
+<p>New script <em>Convert-psake.ps1</em> converts psake build scripts to Invoke-Build.</p>
+<h2>v2.9.6</h2>
+<p>Fixed text of error messages on explicitly set task errors.</p>
+<h2>v2.9.5</h2>
+<p>Revised errors</p>
+<ul>
+<li>Removed irrelevant data from error messages in build summary.</li>
+<li>Amended error messages about issues in task Inputs and Outputs.</li>
+<li>Build result property <code>Errors</code> contains error objects, not messages.</li>
+</ul>
+<p>Custom tasks</p>
+<ul>
+<li>Redesigned the custom task <code>retry</code> so that the function <code>Invoke-RetryAction</code> may be used on its own, see an example in <em>Retry.build.ps1</em>.</li>
+</ul>
+<h2>v2.9.4</h2>
+<p>Custom tasks <code>retry</code> and <code>test</code></p>
+<ul>
+<li><code>Inputs</code> and <code>Outputs</code> are supported, <code>Partial</code> is not.</li>
+<li>Slightly relaxed requirements for <code>Jobs</code>.</li>
+<li><code>test</code>: an upstream error is propagated.</li>
+</ul>
+<p>Property <code>Jobs</code></p>
+<ul>
+<li>The property <code>Jobs</code> of internal task objects is documented and can be used for reading by custom tasks and by external tools for task analysis.</li>
+</ul>
+<h2>v2.9.3</h2>
+<p>Corrected internal processing order. Because <code>Done</code> still may fail a task it should be invoked before storing a checkpoint for a persistent build.</p>
+<p>New sample custom task <code>retry</code>, see <em>Tasks\Retry</em>. Special parameters are <code>RetryTimeout</code> and <code>RetryInterval</code>, similar to <code>Set-BitsTransfer</code>.</p>
+<h2>v2.9.2</h2>
+<p><strong>Revised build output</strong></p>
+<ul>
+<li>Added task names to some error messages for consistency.</li>
+<li>Omitted not so useful job details in action headers and task footers.</li>
+<li>Error summary is not written by default. It was only useful in very complex builds and needed because the switch <code>Summary</code> was not originally introduced.</li>
+</ul>
+<p><strong>Explicitly set task errors</strong></p>
+<ul>
+<li>If a task does not fail but sets its <code>$Task.Error</code> then it is still treated as failed. The build does not stop in this case. This can be used effectively is special cases, e.g. in tasks like <code>test</code>.</li>
+</ul>
+<p><strong>Sample custom task <code>test</code></strong></p>
+<ul>
+<li><a href="https://github.com/nightroman/Invoke-Build/blob/master/Tasks/Test"><code>test</code></a> - Test-tasks are allowed to fail without breaking the build. Errors are counted and written as usual. <code>test</code>'s jobs are optional simple references followed by a single action. If a reference fails an action is skipped.</li>
+</ul>
+<p><strong>Package</strong></p>
+<ul>
+<li>The directory <em>Tasks</em> is included to the package. Ideally, use these tools as samples for your own, they are not parts of the engine, strictly speaking.</li>
+</ul>
+<h2>v2.9.1</h2>
+<p>Fixed incorrect build time written with <code>Summary</code>.</p>
+<h2>v2.9.0 Custom tasks</h2>
+<p>This release introduces new task programming techniques and sample tools.</p>
+<p>Added new <code>task</code> parameters <code>Data</code>, <code>Done</code>, and <code>Source</code>. They are designed for custom tasks, wrappers which add extra features and introduce new DSL commands. <code>Data</code> and <code>Done</code> may be useful in normal tasks. <code>Source</code> is for wrappers only.</p>
+<p>Sample custom tasks:</p>
+<ul>
+<li><p><a href="https://github.com/nightroman/Invoke-Build/blob/master/Tasks/Check"><code>check</code></a> - Build scripts with <code>check</code> tasks represent sort of check-lists. As soon as a <code>check</code> passes it is never invoked again, even in next builds. Scripts are invoked repeatedly until all checks are passed (desired state achieved).</p></li>
+<li><p><a href="https://github.com/nightroman/Invoke-Build/blob/master/Tasks/Repeat"><code>repeat</code></a> - Build scripts with <code>repeat</code> tasks represent sort of schedules. They are invoked periodically. Each <code>repeat</code> task is invoked or skipped according to its defined time span and stored last done time.</p></li>
+</ul>
+<p>DSL commands <code>check</code> and <code>repeat</code> are defined in scripts <code>*.tasks.ps1</code>. They are dot-sourced in build scripts before the first use of new custom tasks. Commands <code>check</code> and <code>repeat</code> are used almost in the same way as <code>task</code>.</p>
+<p>These tools are ready to use in scripts but not included to the package. They are extensions, not parts of the engine. The engine only makes them possible. Q: Should they be included to the package anyway?</p>
+<p>TODO: Think of a custom task <code>test</code> which is allowed to fail without breaking the build. Some minor support from the engine may be needed for proper error counting and reporting.</p>
+<p>P.S. Imagine, one may want to request a new feature, say, <code>-Retry...</code> for tasks. Perhaps this will not be accepted after investigation. Well, it is now up to an author to define such a task with another DSL name and any required parameters:</p>
+<pre><code># Import task library for &quot;retry&quot;.
+. Retry.tasks.ps1
+
+# Synopsis: Note that help comments are possible for custom tasks.
+retry TaskName -RetryCount 5 -RetrySec 60 -ConfirmRetry {
+    ...
+}</code></pre>
+<h2>v2.8.1</h2>
+<p><strong>Task help comments</strong></p>
+<ul>
+<li>Improved getting of task synopsis from comments.</li>
+<li>Fixed unexpected help property order in PS v2.0.</li>
+</ul>
+<h2>v2.8.0</h2>
+<p><strong>Documentation comments</strong></p>
+<p>Help task <em>?</em> returns objects describing tasks. Properties:</p>
+<ul>
+<li><em>Name</em> - task name</li>
+<li><em>Jobs</em> - comma separated task names and own actions shown as <code>{}</code></li>
+<li><em>Synopsis</em> - task synopsis from the preceding comment <code># Synopsis: ...</code></li>
+</ul>
+<p>Returned objects are formatted as three column table by default. If default formatting is not good enough use custom formatting, e.g.:</p>
+<pre><code>Invoke-Build ? | Format-Table -AutoSize
+Invoke-Build ? | Format-List Name, Synopsis</code></pre>
+<p><strong><em>Show-BuildTree.ps1</em></strong></p>
+<ul>
+<li>Always shows task synopsis, if any.</li>
+<li>Removed not needed switch <em>Comment</em>.</li>
+</ul>
+<p><strong>$Task, step 2. Potentially incompatible</strong></p>
+<ul>
+<li><code>$Task</code> is now constant, <code>Enter|Exit-BuildTask</code> and <code>Enter|Exit-BuildJob</code> cannot override it, say, accidentally.</li>
+<li>Event functions <code>Enter|Exit-BuildTask</code> do not accept a task as an argument, use the automatic variable <code>$Task</code> instead.</li>
+<li>Event functions <code>Enter|Exit-BuildJob</code> do not accept a task as the first argument, use <code>$Task</code> instead. The job number became the first argument.</li>
+</ul>
+<p>With this step integration of the automatic variable <code>$Task</code> is complete.</p>
+<h2>v2.7.4 $Task</h2>
+<p><strong>Default script resolution</strong></p>
+<p>The script specified by <code>$env:InvokeBuildGetFile</code> (gets a non standard default build file) is invoked with the full directory path as an argument. It may be invoked several times during the directory branch search with each path passed in. Old scripts should work fine but some of them may be simplified now.</p>
+<p><strong>Automatic variable $Task. Step 1</strong></p>
+<p>A new automatic variable <code>$Task</code> represents the current task instance. It is available for the task script blocks defined by parameters <code>If</code>, <code>Inputs</code>, <code>Outputs</code>, <code>Jobs</code> and the event functions <code>Enter|Exit-BuildTask</code> and <code>Enter|Exit-BuildJob</code>.</p>
+<p>Why? Some advanced task scripts need this instance (e.g. shared between tasks). A common variable <code>$Task</code> seems to be simpler than use of a parameter in each of 8 above code pieces. Let's keep parameters available for something else.</p>
+<p><strong>Potentially incompatible</strong></p>
+<p>Build scripts with the parameter <code>$Task</code> or script variable <code>$Task</code> may fail. Rename this variable. The parameter <code>$Task</code> is not good anyway because it conflicts with Invoke-Build and cannot be used as the dynamic parameter.</p>
+<p>As far as <code>Enter|Exit-*</code> are invoked in the scope where <code>$Task</code> is defined, make sure they do not change it. Other task code may change it in its own scope. But such hiding of the system variable is not recommended.</p>
+<p><strong>Step 2. The next version</strong></p>
+<p><code>Enter|Exit-BuildTask</code> and <code>Enter|Exit-BuildJob</code> will not be accepting the task as the first argument. The new variable <code>$Task</code> should be used instead. Most of scripts may be prepared now. Change of <code>Enter|Exit-BuildJob</code> may be breaking, the second parameter will become first.</p>
+<h2>v2.7.2, v2.7.3</h2>
+<p>Added missing <em>Invoke-TaskFromISE.ps1</em>.</p>
+<p>Minor tweaks in code and help.</p>
+<h2>v2.7.1</h2>
+<p>This version mostly completes changes announced for v2.7.</p>
+<p><em>Invoke-Build</em></p>
+<ul>
+<li><em>Build.ps1</em> features moved to <em>Invoke-Build</em>:
+<ul>
+<li>Switch <code>Summary</code> tells to write summary after build.</li>
+<li>Advanced resolution of the default build script.</li>
+</ul></li>
+<li>Shows some more details in task listings.</li>
+<li>Logs task starts as &quot;Task X:&quot;.</li>
+</ul>
+<p><em>Show-BuildTree.ps1</em></p>
+<ul>
+<li>The rest of <em>Build.ps1</em> transformed to <em>Show-BuildTree.ps1</em>.</li>
+<li>By default it shows the default task tree, not all trees.</li>
+<li>The special task <code>*</code> tells to show all root task trees.</li>
+</ul>
+<p><em>TabExpansionProfile.Invoke-Build.ps1</em></p>
+<ul>
+<li>Removed not needed <em>Build.ps1</em> completers.</li>
+</ul>
+<h2>v2.7.0 - Dynamic parameters</h2>
+<p><strong>Persistent builds, incompatible change</strong></p>
+<p>Invoke-Build uses the new switch <code>Resume</code> in order to resume persistent builds. It makes use of persistent builds easier and avoids conflicts with dynamic parameters and coming soon changes.</p>
+<p>The new switch must be added to old commands which resume builds. Hopefully it should not break much because resuming is often supposed to be done manually.</p>
+<p><strong>Dynamic parameters</strong></p>
+<p>As far as <em>Build.ps1</em> dynamic parameters work well, <em>Invoke-Build.ps1</em> adopts them, too. Dynamic parameters make command lines simple and neat. Compare:</p>
+<p>New way, it really cannot be simpler:</p>
+<pre><code>Invoke-Build -Configuration Release -Platform x64</code></pre>
+<p>Old way, still used in special cases:</p>
+<pre><code>Invoke-Build -Parameters @{Configuration = &#39;Release&#39;; Platform = &#39;x64&#39;}</code></pre>
+<p>Mind an extra bonus: TabExpansion works fine with dynamic parameters.</p>
+<p><strong>Coming soon in v2.7</strong></p>
+<p><em>Build.ps1</em> features to be moved to <em>Invoke-Build</em>:</p>
+<ul>
+<li>Advanced resolution of the default build script.</li>
+<li>Switch <code>Summary</code> to write summary after build.</li>
+<li>Switch <code>NoExit</code> will be dropped.</li>
+</ul>
+<h2>v2.6.3 - PS v4.0 upgrade</h2>
+<p><em>Build.ps1</em>: Adjusted for the new common parameter <em>PipelineVariable</em>.</p>
+<h2>v2.6.2</h2>
+<p><em>Invoke-TaskFromISE.ps1</em> also supports the form <code>task [...] -Name TaskName</code>. Still, not all possible forms are recognized, see the script help notes.</p>
+<p>Avoided a recently introduced internal variable exposed to tasks.</p>
+<h2>v2.6.1</h2>
+<p><em>Invoke-TaskFromISE.ps1</em></p>
+<p>This new script invokes the current task from the build script being edited in PowerShell ISE. It is invoked either in ISE or in PowerShell console. See the script help comments for the details, e.g. how to associate with shortcuts.</p>
+<h2>v2.6.0</h2>
+<p><strong>Easier persistent builds</strong></p>
+<p>Build script parameters are automatically exported and imported on persistent builds. Custom <code>Export-Build</code> and <code>Import-Build</code> do not have to care of them. Moreover, some script variables may be declared as parameters simply in order to be persistent and <code>Export-Build</code> and <code>Import-Build</code> may be dropped if they deal with these variables and do nothing else.</p>
+<p>Reminder: checkpoint files from other versions must not be used.</p>
+<h2>v2.5.2</h2>
+<p>Minor tweaks in help.</p>
+<p><em>Build.ps1</em> - There was a subtle conflict between the parameter <code>Checkpoint</code> and advanced resolution of <code>File</code>. Instead of introducing caveats for <code>File</code> and making things more complex we drop <code>Checkpoint</code>, i.e. it should be used with <em>Invoke-Build.ps1</em>, not with the command line helper <em>Build.ps1</em>.</p>
+<p>Notes:</p>
+<ul>
+<li>If somebody wants this feature back then submit a request with reasons.</li>
+<li>This change is &quot;not breaking&quot;, <em>Build.ps1</em> is for typing in command lines.</li>
+</ul>
+<h2>v2.5.1</h2>
+<p>Function and variable names starting with <code>*</code> are reserved for the engine. For technical reasons they cannot be completely hidden from scripts. Scripts should not use functions and variables with such names. It is unlikely that they ever do this but this is possible and should be avoided.</p>
+<h2>v2.5.0</h2>
+<p>Some changes in terminology and syntax, not breaking for now. Allowed to fail task references are now called &quot;safe&quot;. They are created by the new command <em>job</em> (<em>New-BuildJob</em>) with the switch <em>Safe</em>. In other words,</p>
+<p>DO (new):</p>
+<pre><code>task Task2 (job Task1 -Safe), { ... }</code></pre>
+<p>DON'T (old):</p>
+<pre><code>task Task2 @{ Task1 = 1 }, { ... }</code></pre>
+<p>The new syntax is less cryptic, self describing, and easy to extend.</p>
+<p>The old syntax for now works as well. But it is deprecated, not documented, and very likely will stop working if the command <em>job</em> introduces more options.</p>
+<h2>v2.4.7</h2>
+<p>Issue #1. Per user request, reduced density of the source code of <em>Invoke-Build.ps1</em>, for better readability, easier debugging, etc.</p>
+<p>Joined two internal functions <code>*U1</code> and <code>*U2</code>.</p>
+<h2>v2.4.6</h2>
+<p>Amended documentation.</p>
+<p>The first line &quot;Build ...&quot;: write resolved task names, i.e. write the actual default task name instead of nothing or <code>'.'</code> and task list instead of <code>'*'</code>.</p>
+<p><em>Demo</em> scripts are excluded. They are more boring tests than useful examples. In any case they are available online at the project site.</p>
+<h2>v2.4.5</h2>
+<p><em>Build.ps1</em>: fixed issues on scripts with cmdlet binding parameters.</p>
+<h2>v2.4.4</h2>
+<p>Replaced dark yellow build messages with cyan. Dark yellow looks like white or gray in Microsoft PowerShell &quot;noble blue&quot; consoles. Besides, MSBuild prints similar build messages as cyan.</p>
+<h2>v2.4.3</h2>
+<p>Amended <em>TabExpansionProfile.Invoke-Build.ps1</em>. If it is used in ISE then completion lists should show proper icons. If the referenced <code>TabExpansions2.ps1</code> is used then update it, too.</p>
+<h2>v2.4.2</h2>
+<p>Fixed</p>
+<ul>
+<li>PS v2/v3 differences of <code>Invoke-Build ** missing-directory</code>.</li>
+<li><em>Build.ps1</em> with the special task <code>**</code>.</li>
+</ul>
+<p>Amended <em>TabExpansionProfile.Invoke-Build.ps1</em>.</p>
+<h2>v2.4.1</h2>
+<p>Finishing touches on dynamic parameters of <em>Build.ps1</em>.</p>
+<p>Updated the wiki with information about recently added features.</p>
+<ul>
+<li><a href="https://github.com/nightroman/Invoke-Build/wiki/Build.ps1">Build.ps1</a></li>
+<li><a href="https://github.com/nightroman/Invoke-Build/wiki/TabExpansion2">TabExpansion2</a></li>
+</ul>
+<h2>v2.4.0</h2>
+<p><strong>Dynamic build script parameters in Build.ps1</strong></p>
+<p>If a build script parameters do not intersect with <em>Build.ps1</em> parameters then they can be specified directly for <em>Build.ps1</em>.</p>
+<p>Example. If a build script parameters are</p>
+<pre><code>param
+(
+    $Platform = &#39;Win32&#39;,
+    $Configuration = &#39;Release&#39;
+)</code></pre>
+<p>then it is fine to call it naturally</p>
+<pre><code>Build -Platform x64 -Configuration Debug</code></pre>
+<p>instead of not so easy to type</p>
+<pre><code>Build -Parameters @{Platform = &#39;x64&#39;; Configuration = &#39;Debug&#39;}</code></pre>
+<p>Note that TabExpansion works with dynamic parameters.</p>
+<p><strong>TabExpansionProfile.Invoke-Build.ps1</strong></p>
+<p>This new script is <code>TabExpansion2</code> profile with custom completers for <em>Invoke-Build.ps1</em> and <em>Build.ps1</em>. It can be used either directly with <em>TabExpansion2.ps1</em> or slightly adapted for other replacements of build-in <code>TabExpansion2</code>. It completes arguments of parameters <em>Task</em> (task names from a build file) and <em>File</em> (normally suggests available <em>.build.ps1</em> and <em>.test.ps1</em> files).</p>
+<p><strong>Warning on script output</strong></p>
+<p>Output from scripts on adding tasks is treated as unexpected. It is intercepted and written as a warning. Firstly, this catches a common mistake. Example: the script outputs a script block instead of adding a task with it</p>
+<pre><code>task Task1
+{
+    ...
+}</code></pre>
+<p>Secondly, this avoids noise data on getting tasks for analysis.</p>
+<p><strong>New special task ??</strong></p>
+<p>The task <code>??</code> is used to get tasks without invoking. It replaces the old not so easy to use approach. This new simple code</p>
+<pre><code>$tasks = Invoke-Build ??</code></pre>
+<p>is used instead of</p>
+<pre><code>$null = Invoke-Build ? -Result result
+$tasks = $Result.All</code></pre>
+<p>The task <code>?</code> is now used only to show brief task information.</p>
+<p>This change does not affect normal build script scenarios. But wrapper scripts which get tasks for analysis like <em>Build.ps1</em>, <em>Show-BuildGraph.ps1</em> should be upgraded.</p>
+<p><strong>Combined special tasks</strong></p>
+<p><code>?</code> and <code>??</code> can be combined with <code>**</code>.</p>
+<p>Show all tasks from all <em>.test.ps1</em> files:</p>
+<pre><code>Invoke-Build ?, **</code></pre>
+<p>Get task dictionaries for all <em>.test.ps1</em> files:</p>
+<pre><code>Invoke-Build ??, **</code></pre>
+<p>Note that the helper <em>Build.ps1</em> supports these new features. In particular it can be used now for getting task dictionaries (it was able only to display, analyse, and etc. but not to return).</p>
+<p><strong>Other changes</strong></p>
+<p>The <code>Get-BuildFileHook</code> is dropped. Wrapper scripts should provide a file if the default is missing. They can use a copy of the function <code>Get-BuildFile</code>. This approach seems to be simple and natural comparing with a callback. For example, see how <em>Build.ps1</em> uses <code>Get-BuildFile</code> and extends it.</p>
+<h2>v2.3.0</h2>
+<p><code>Build.ps1</code></p>
+<p>New switch <code>NoExit</code> tells to prompt &quot;Press enter to exit&quot;.</p>
+<h2>v2.2.0</h2>
+<p><code>use</code> (<code>Use-BuildAlias</code>) accepts MSBuild version strings (e.g. <code>'4.0'</code>, <code>'2.0'</code>) and resolves them to paths using information from the registry.</p>
+<h2>v2.1.1</h2>
+<p>Adapted Invoke-Build for <code>Set-StrictMode -Version Latest</code></p>
+<h2>v2.1.0</h2>
+<p>New special task <code>**</code> invokes <code>*</code> (all tasks, normally tests) for all files <code>*.test.ps1</code> found recursively in the current directory or a directory specified by the parameter <code>File</code>. It simplifies invocation of tests represented by tasks in several scripts in a directory tree.</p>
+<p>Renamed some test scripts to <code>*.test.ps1</code> and made them called automatically with the new special task <code>**</code>.</p>
+<h2>v2.0.1</h2>
+<p>Minor improvements in <em>Invoke-Builds.ps1</em>. The key <code>File</code> in parameters is now optional. The omitted one is resolved to the usual default build script. Added a test.</p>
+<p>Changed color of messages <em>Build &lt; tasks &gt; &lt; file &gt;</em> to dark green.</p>
+<h2>v2.0.0</h2>
+<p>This version introduces major but mostly cosmetic changes in advanced features. Scripts using these features should be upgraded. If some scripts are not going to be upgraded then an old copy of tools can be used for building them. See <a href="https://github.com/nightroman/Invoke-Build/wiki/Portable-Build-Scripts">Portable Build Scripts</a>.</p>
+<p>Renamed <code>Write-BuildText</code> to <code>Write-Build</code>.</p>
+<p>Renamed <code>Assert-BuildTrue</code> to <code>Assert-Build</code>. This change is not breaking if this function is used by its recommended alias <code>assert</code>.</p>
+<p>Renamed <code>Enter-BuildScript</code>, <code>Exit-BuildScript</code> to <code>Enter-Build</code>, <code>Exit-Build</code>. Old names are misleading, events are invoked before and after a build, not a build script.</p>
+<p><code>Use-BuildAlias (use)</code> does not support the empty <code>Path</code> as a shortcut for <code>[System.Runtime.InteropServices.RuntimeEnvironment]::GetRuntimeDirectory()</code>.</p>
+<p>Changed syntax of incremental tasks to less cryptic and more like MSBuild. Replaced parameters <code>Incremental</code>, <code>Partial</code> with <code>Inputs</code>, <code>Outputs</code>, and <code>[switch]Partial</code>.</p>
+<p>It is allowed to add two or more tasks with the same name. The last added wins. So it is possible to redefine existing tasks. Well, it is also possible to use the same name by mistake. Flexibility or safety? MSBuild chooses flexibility, Invoke-Build follows.</p>
+<p>Task parameter <code>After</code> tells to add a task to the end of job lists. It used to be inserted after the last script job - this is often the same but not always.</p>
+<p>Removed <code>Invoke-Build.ps1</code>'s parameter <code>Hook</code>. If the default script is not found the command <code>Get-BuildFileHook</code> is called if it exists. See <code>Build.ps1</code>.</p>
+<p>Changed build results of <code>Invoke-Build.ps1</code> and <code>Invoke-Builds.ps1</code> in order to avoid excessive and duplicated data. See help.</p>
+<p><code>Invoke-Build.ps1</code>'s parameter <code>Result</code> always returns an instance of build information. Its new property <code>All</code> contains all defined task objects.</p>
+<p>Replaced exposed internal variables <code>BuildInfo</code>, <code>BuildList</code>, and <code>BuildHook</code> with a new variable <code>*</code>. Build scripts should not use it. This change is not breaking unless internal variables are used (illegal) or <code>${*}</code> is used in scripts (unlikely).</p>
+<p>Renamed the help file <code>Invoke-Build.ps1-Help.xml</code> to <code>Invoke-Build-Help.xml</code>.</p>
+</body>
+</html>
