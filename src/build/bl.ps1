@@ -1,4 +1,4 @@
-#requires -Version 3.0
+#requires -Version 4.0
 <#
 .Synopsis
 	Build luncher for (https://github.com/nightroman/Invoke-Build)
