@@ -25,7 +25,7 @@ param(
     )
 
 
-$ValueNamesToExport =@("repoPath", "configPath", "buildScriptsPath",
+$ValueNamesToExport =@("repoPath", "configPath", "scriptsPath",
  "toolsPath", "buildEnv", "buildTarget",  "buildPath","buildNumber", "gitCommitNumber",
  "buildDateTime" , "gitBranch", "buildMiscInfo")
 
