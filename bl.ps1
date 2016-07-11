@@ -60,7 +60,7 @@ $parmsToExport.GetEnumerator()| Sort-Object -Property name | Format-Table Name, 
 
 try {
         # Invoke the build and keep results in the variable Result
-        & $ib -File $buildScriptsFile -Parameters $parmsToExport -Result Result 
+        & $ib -File $buildScriptsPath -Parameters $parmsToExport -Result Result 
     }
 catch {
  Write $Result.Error
