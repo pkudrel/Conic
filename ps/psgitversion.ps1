@@ -22,6 +22,7 @@ function Get-GitVersion() {
 
 	# magic MagicMajorMinorPatchPrivate form build number			
 	$magic = Get-MagicMajorMinorPatchPrivate $build
+	$magicSimple = Get-MagicMajorMinorPatch $build
 
 	# if all important items are equal zero use magic
 	if ( ($major -eq 0) -and ($minor -eq 0) -and ($patch -eq 0) -and ($private -eq 0) ){
@@ -87,8 +88,7 @@ function Get-GitVersion() {
 	"CommitsCounter" = $commitNumber ; "CommitsCounterPad" = $commitNumberPad;  "CommitsDateTime" = "$dateTime";
 	"Sha" = "$sha" ; 
 	"BuildMagicNumber" = "$($magic.Major).$($magic.Minor).$($magic.Patch).$($magic.Private)";
-	
-	
+	"BuildMagicShortNumber" = "$($magicSimple.Major).$($magicSimple.Minor).$($magicSimple.Patch)"
 	
 	}
 
@@ -231,6 +231,26 @@ function Get-MagicMajorMinorPatchPrivate {
 			$r.Patch =  [math]::floor($rest / 10 ) 
 			$rest =  ($rest - ($r.Patch * 10))
 			$r.Private =  [math]::floor( $rest / 1 ) 
+			return $r
+}
+
+
+<#
+.Synopsis
+	Get "magic"  Major, Minor, Patch number from build
+#>
+function Get-MagicMajorMinorPatch {
+	
+		param(
+				[parameter(Mandatory=$true)] [int] $build
+			)
+
+			$r = [PSCustomObject]  @{"Major" = 0; "Minor" = 0; "Patch" = 0;}
+			$r.Major =  [math]::floor($build / 100 )
+			$rest =  ($build - ($r.Major * 100))
+			$r.Minor =  [math]::floor($rest/10)
+			$rest =  ($rest - ($r.Minor * 10))
+			$r.Patch =  [math]::floor($rest / 1 ) 
 			return $r
 }
 
