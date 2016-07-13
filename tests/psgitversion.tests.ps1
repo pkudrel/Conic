@@ -15,4 +15,3 @@ Assert ($v.NuGetVersion -eq "12.3.4") {"Invalid NuGetVersion. Should be '12.3.4'
 $v = Get-GitVersion "standard"  1 2 3 999 $v.special  $buildEnv 4
 
 
-

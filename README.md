@@ -8,7 +8,8 @@ A few PowerShell scripts that make Build process easier
 
 ### Misc notes 
 How to marge this repository as a subtree?
-(from https://help.github.com/articles/about-git-subtree-merges/)
+from https://help.github.com/articles/about-git-subtree-merges/
+https://medium.com/@porteneuve/mastering-git-subtrees-943d29a798ec#.8z199wxmt
 
 ```
 # init
