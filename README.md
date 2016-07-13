@@ -13,11 +13,7 @@ How to marge this repository as a subtree?
 ```
 # init
 git remote add -f  ps-auto-helpers https://github.com/pkudrel/PsAutomationHelpers.git
-git merge -s ours --no-commit  ps-auto-helpers/master
-git read-tree --prefix=src/build/ -u ps-auto-helpers/master
-git commit -m "Subtree merged"
+git subtree add  --prefix=src/build --squash ps-auto-helpers master
 
-# update 
-git pull -s subtree ps-auto-helpers master
 ```
 
