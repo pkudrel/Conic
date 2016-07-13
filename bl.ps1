@@ -16,11 +16,12 @@ param(
 		$buildScriptsPath = (Join-Path $scriptsPath  "default.ps1" ),
 		$buildTarget = "Release",
 		$buildEnv = "local",
-		$buildNumber = 0,
+		$buildCounter = 0,
 		$buildMiscInfo = "",
 		$buildDateTime = ((Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")),
 		$gitCommitNumber = 0,
 		$gitBranch = "",
+		$gitVersionStrategy = "standard",
 		$ib = (Join-Path $scriptsPath "\tools\ib\Invoke-Build.ps1")
     )
 
@@ -36,11 +37,11 @@ $ValueNamesToExport =@("repoPath", "configPath", "scriptsPath",
 # make 
 $config = Get-Content $configPath | Out-String | ConvertFrom-Json
 $v = ([PSCustomObject]$config.SemVer)
-$bv = Get-GitVersion  $v.major $v.minor $v.patch $buildNumber $v.special  $buildEnv
+$bv = Get-GitVersion $gitVersionStrategy $v.major $v.minor $v.patch $buildCounter $v.special  $buildEnv
 $global:psgitversion = $bv 
 
 
-$buildNumber = $bv.Build
+$buildNumber = $bv.BuildCounter
 $gitCommitNumber = $bv.CommitsCounter
 $gitBranch = $bv.BranchName
 $buildMiscInfo = $bv.AssemblyInformationalVersion
