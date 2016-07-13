@@ -31,12 +31,12 @@ function Get-GitVersion() {
 
 	switch ($strategy) {
 	standard { 
-		# if all important items are equal zero use magic
+		# if all important items are equal zero use magic simple
 		if ( ($major -eq 0) -and ($minor -eq 0) -and ($patch -eq 0) -and ($private -eq 0) ){
-			$major = $magic.Major;
-			$minor = $magic.Minor;
-			$patch = $magic.Patch;
-			$private = $magic.Private;
+			$major = $magicSimple.Major;
+			$minor = $magicSimple.Minor;
+			$patch = $magicSimple.Patch;
+			$private = 0;
 		}
 		break     
 	}
