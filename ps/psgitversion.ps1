@@ -30,34 +30,34 @@ function Get-GitVersion() {
 
 
 	switch ($strategy) {
-	standard { 
-		# if all important items are equal zero use magic simple
-		if ( ($major -eq 0) -and ($minor -eq 0) -and ($patch -eq 0) -and ($private -eq 0) ){
-			$major = $magicSimple.Major;
-			$minor = $magicSimple.Minor;
-			$patch = $magicSimple.Patch;
-			$private = 0;
+		standard { 
+			# if all important items are equal zero - use magic simple
+			if ( ($major -eq 0) -and ($minor -eq 0) -and ($patch -eq 0) -and ($private -eq 0) ){
+				$major = $magicSimple.Major;
+				$minor = $magicSimple.Minor;
+				$patch = $magicSimple.Patch;
+				$private = 0;
+			}
+			break     
 		}
-		break     
-	}
-	fromBuildCounterMMP {
-			$major = $magicSimple.Major;
-			$minor = $magicSimple.Minor;
-			$patch = $magicSimple.Patch;
-			$private = 0;
-    break
-	}
-	fromBuildCounterMMPP {
-			$major = $magic.Major;
-			$minor = $magic.Minor;
-			$patch = $magic.Patch;
-			$private = $magic.Private;
+		fromBuildCounterMMP {
+				$major = $magicSimple.Major;
+				$minor = $magicSimple.Minor;
+				$patch = $magicSimple.Patch;
+				$private = 0;
 		break
- 	}
-	default {
- 		throw "No matching strategy: $strategy"
- 	}
-}
+		}
+		fromBuildCounterMMPP {
+				$major = $magic.Major;
+				$minor = $magic.Minor;
+				$patch = $magic.Patch;
+				$private = $magic.Private;
+			break
+		}
+		default {
+			throw "No matching strategy: $strategy"
+		}
+	}
 
 
 
@@ -99,9 +99,6 @@ function Get-GitVersion() {
 	$informationalVersion = "$semVer+$fullBuildMetaData";
 
 
-    
-
-
 	 $result = [PSCustomObject]  @{
 	"Major"= $major; "Minor"= $minor; "Patch" = $patch; "BuildCounter" = $buildCounter; "Special" = $special; "Env" = $buildEnv; "Private" = $private;
 	"AssemblyVersion" = "$major.$minor.0.0"; "AssemblyFileVersion" = "$major.$minor.$buildCounter.0"; "AssemblyInformationalVersion" = $informationalVersion;
@@ -117,33 +114,7 @@ function Get-GitVersion() {
 	"Sha" = "$sha" ; 
 	"BuildMagicNumber" = "$($magic.Major).$($magic.Minor).$($magic.Patch).$($magic.Private)";
 	"BuildMagicShortNumber" = "$($magicSimple.Major).$($magicSimple.Minor).$($magicSimple.Patch)"
-	
 	}
-
-
-	#if ($env:APPVEYOR) { $buildCounter = "$buildCounterCommitNumber"}
-	#ElseIf ($env:TEAMCITY_VERSION) {
-	#	$host.UI.RawUI.BufferSize = New-Object System.Management.Automation.Host.Size(8192,50)
-	#	$buildCounter = "$buildCounterCounter" 	} 
-	#else {
-	#	$buildCounter = Get-LocalBuildVersion  $filePath
-	#	$semver.special = $semver.special + $env
-	#}
-
-	#$result.Build = $buildCounter
-	#$result.Sem = ("{0}.{1}.{2}" -f $semver.major, $semver.minor, $semver.patch)	
-
-	#if ($semver.special  -ne ""){
-	#	$result.Sem = ("{0}-{1}" -f $result.Sem, $semver.special)	
-	#}
-	#$result.Sem = ("{0}.{1}" -f $result.Sem, $buildCounter)	 
-
-
-	#if ($env:TEAMCITY_VERSION) {
-	#	$s  = $result.Sem;
-	#	Write-Host  "##teamcity[buildNumber '$s']"
-	#}
-
 	return $result
 }
 
