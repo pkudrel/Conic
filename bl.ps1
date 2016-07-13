@@ -9,7 +9,7 @@
 param(
 		[Parameter(Mandatory=$false)]
 		$repoPath = (Resolve-Path ( & git rev-parse --show-toplevel)),
-		$scriptsPath = (Split-Path $MyInvocation.MyCommand.Path -Parent  }) ,
+		$scriptsPath = (Split-Path $MyInvocation.MyCommand.Path -Parent) ,
 		$buildPath = (Join-Path $repoPath "\build-out" ),
 		$toolsPath = (Join-Path $repoPath "\tools" ),
 		$configPath = (Join-Path $repoPath "\.config\build.json" ),
