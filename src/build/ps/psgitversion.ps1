@@ -130,6 +130,7 @@ function Exec {
     )
 	Write-Host "Command: $Command"
     & $Command
+	Write-Host "LASTEXITCODE: $LASTEXITCODE"
     if ($LASTEXITCODE -ne 0) {
         throw ("Exec: " + $ErrorMessage)
     }
