@@ -10,4 +10,4 @@ deploy:
   skip_symbols: true
   artifact: C:\projects\conic\build-out\nuget\*.nupkg
 artifacts:
-  - path: '**\*.nupkg'
+  - path: 'build-out\nuget\**\*.nupkg'
