@@ -74,8 +74,6 @@
     <Compile Include="Args\ManifestOptions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Samples\manifest.json.sample" />
-    <EmbeddedResource Include="Samples\conic.config.json.sample" />
     <Compile Include="Wormhole\ReadResult.cs" />
     <Compile Include="Wormhole\WormholeService.cs" />
     <Compile Include="Wormhole\WormholeServiceMulti.cs" />

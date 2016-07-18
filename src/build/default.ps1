@@ -228,6 +228,8 @@ task Pack-Nuget  {
 	
 	cp "$margeDir\Conic.exe" "$nugetTempDir\tools"
 	cp "$margeDir\NLog.config" "$nugetTempDir\tools"
+	cp "$scriptsPath\Samples\conic.config.json.sample" "$nugetTempDir\tools"
+	cp "$scriptsPath\Samples\manifest.json.sample" "$nugetTempDir\tools"
     
     $spec = [xml](get-content $spacFilePath)
     $spec.package.metadata.version = ([string]$spec.package.metadata.version).Replace("{Version}", $buildVersion.NuGetVersion)

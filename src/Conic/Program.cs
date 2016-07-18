@@ -5,6 +5,7 @@ using System.Text;
 using CommandLine;
 using Conic.Args;
 using Conic.Misc;
+using Conic.Wormhole;
 using NLog;
 
 namespace Conic
@@ -24,6 +25,7 @@ namespace Conic
             }
             _log.Info("Start Conic ...");
 
+            var startUp = new StartUp();
 
             if (args.Any())
             {
@@ -40,25 +42,29 @@ namespace Conic
 
                 var result = parser.ParseArguments<ManifestOptions, ConfigOptions>(args);
                 result
-                    .WithParsed<ManifestOptions>(opts => { Console.WriteLine("InitOptions"); })
-                    .WithParsed<ConfigOptions>(opts => { Console.WriteLine("ConfigOptions"); })
-                    .WithNotParsed(opts =>
-                    {
-                        WriteErrors(sb);
-                    });
+                    .WithParsed<ManifestOptions>(opts => { startUp.CreateManifest(opts); })
+                    .WithParsed<ConfigOptions>(opts => { startUp.CreateConfig(opts); })
+                    .WithNotParsed(opts => { WriteErrors(sb); });
                 ;
             }
             else
             {
-                Console.WriteLine("start ");
-                //    using (singleGlobalInstance)
-                //    {
-                //        var startUp = new StartUp();
-                //        startUp.CreateManifestIfNotExists();
-                //        var config = startUp.GetOrCreateConfig();
-                //        var ws = new WormholeService(config.PipeName);
-                //        ws.StartServer();
-                //    }
+                     Console.WriteLine("start ");
+                using (singleGlobalInstance)
+                {
+                    var result   = startUp.GetConfig();
+                    if (result.Item1)
+                    {
+                        var ws = new WormholeService(result.Item2.PipeName);
+                        ws.StartServer();
+                    }
+                    else
+                    {
+                        if (!Environment.UserInteractive) return;
+                        Console.WriteLine("Config file not found.");
+       
+                    }
+                }
             }
         }
 

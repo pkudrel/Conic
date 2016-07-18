@@ -34,9 +34,14 @@
     <Compile Include="ps\psgitversion.ps1" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Samples\" />
     <Folder Include="nuget\" />
     <Folder Include="test\" />
     <Folder Include="ps\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Samples\conic.config.json.sample" />
+    <Content Include="Samples\manifest.json.sample" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="Build" />
