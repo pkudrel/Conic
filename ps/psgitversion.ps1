@@ -13,8 +13,8 @@ function Get-GitVersion() {
 				[parameter(Mandatory=$false)] [int] $buildCounter = 0,
 				[parameter(Mandatory=$false)] [string] $special = "",
 				[parameter(Mandatory=$false)] [string] $buildEnv = "",
-				[parameter(Mandatory=$false)] [string] $gitBranch = ""
-				[parameter(Mandatory=$false)] [int] $private = 0,
+				[parameter(Mandatory=$false)] [string] $gitBranch = "",
+				[parameter(Mandatory=$false)] [int] $private = 0
 			)
  	
 
