@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Reflection;
 using System.Text;
+using Conic.Args;
 using Conic.Manifest;
 
 namespace Conic.Misc
@@ -39,10 +40,12 @@ namespace Conic.Misc
             return result;
         }
 
-        public void CreateManifestIfNotExists()
+
+
+        public void CreateManifest(ManifestOptions manifestOptions)
         {
             var m = new ManifestService(PathToConnectorExeFile, PathToManifestFile);
-            m.InitializeManifest();
+            m.CreateManifestUpdateRegistry(manifestOptions.Name, manifestOptions.ExtensionId);
         }
     }
 }

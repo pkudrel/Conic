@@ -1,7 +1,7 @@
 {
-  "ProductName": "Conic",
+  "ProductName": "Conic - Chrome native messaging connector",
   "CompanyName": "DenebLab",
-  "Copyright": "Copyright (c) 2016 Piotr Kudrel, DenebLab",
+  "Copyright": "Copyright (c) 2016 Piotr Kudrel",
   "SemVer": {
     "major": 1,
     "minor": 0,
@@ -10,8 +10,6 @@
   },
   "BuildProjectDirPath": "\\src\\build",
   "ProjectFile": "\\src\\Conic\\Conic.csproj",
-  "PluginProjectFile": "\\src\\Example\\Conic.Example.ChromeExtension\\Conic.Example.ChromeExtension.csproj",
-  "WinformProjectFile": "\\src\\Example\\Conic.Example.WinForm\\Conic.Example.WinForm.csproj",
   "SlnFile": "\\src\\Conic.sln",
   "SrcDir": "\\src",
   "PackagesDir": "\\src\\packages",

@@ -1,0 +1,9 @@
+﻿{
+  "name": "example.conic.host",
+  "path": "path-to-conic-exe",
+  "allowed_origins": [
+    "chrome-extension://extension-id/"
+  ],
+  "description": "Read more: https://developer.chrome.com/extensions/nativeMessaging",
+  "type": "stdio"
+}

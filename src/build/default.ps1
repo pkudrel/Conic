@@ -12,6 +12,7 @@ param(
 		$buildEnv,
 		$repoPath,
 		$conf = (Get-Content $configPath | Out-String | ConvertFrom-Json),
+		$buildVersion = $global:psgitversion,
 		$buildTmpDir = (Join-Path $buildPath "tmp"),
 		$buildDir = (Join-Path $buildTmpDir "build"),
 		$buildExampleDir = (Join-Path $buildTmpDir "build-example"),
@@ -31,7 +32,6 @@ param(
 		$nugetDir = (Join-Path $buildPath "nuget"),
 		$packtDir = (Join-Path $buildPath "pack")
     )
-Write-Host "aa:$scriptsPath"
 
 # inser tools
 . (Join-Path $scriptsPath "ps\misc.ps1")
@@ -41,8 +41,8 @@ use 14.0 MSBuild
 # Synopsis: Remove temp files.
 task Clean {
 
-	Write-Host $buildOutDir
-	Ensure-Dir-Exists-And-Is-Empty $buildOutDir
+	Write-Host $buildDir
+	Ensure-DirExistsAndIsEmpty $buildDir
 }
 
 # Synopsis: Download tools if needed
@@ -51,11 +51,11 @@ task Get-Tools {
 	if((Test-Path $nuget) -eq 0)
 	{
 		$nugetDir = Split-Path  $nuget -parent
-		Ensure-Dir-Exists $nugetDir
+		Ensure-DirExists $nugetDir
 		wget "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" -outfile $nuget
 	}
 
-	Ensure-Dir-Exists $packagesDir
+	Ensure-DirExists $packagesDir
 
 	if((Test-Path $libz) -eq 0)
 	{
@@ -66,9 +66,9 @@ task Get-Tools {
 # Synopsis: Build the project.
 task Build-Conic {
 	Write-Host "Build Conic"
-	$projectFile = Join-Path $buildRepoRooDir  $conf.ProjectFile
-	Ensure-Dir-Exists-And-Is-Empty $buildDir 
-	Update-AssemblyInfo $srcDir $currentAssemblyInfo $buildVs $buildGitBranch $buildGitHashAndTime $conf.ProductName $conf.CompanyName $conf.Copyright
+	$projectFile = Join-Path $repoPath  $conf.ProjectFile
+	Ensure-DirExistsAndIsEmpty $buildDir 
+	Update-AssemblyInfo $srcDir $currentAssemblyInfo $buildVersion.AssemblyVersion $buildVersion.AssemblyFileVersion $buildVersion.AssemblyInformationalVersion $conf.ProductName $conf.CompanyName $conf.Copyright
 
 	try {
 		exec { msbuild $projectFile /t:Build /p:Configuration=$buildTarget /v:quiet /p:OutDir=$buildDir    } 
@@ -87,16 +87,16 @@ task Build-Conic {
 # Synopsis: Build the example.
 task Build-Example {
 	Write-Host "Build Example"
-	$winformProjectFile = Join-Path $buildRepoRooDir  $conf.WinformProjectFile
-	Ensure-Dir-Exists-And-Is-Empty $buildExampleDir
+	$winformProjectFile = Join-Path $repoPath  $conf.WinformProjectFile
+	Ensure-DirExistsAndIsEmpty $buildExampleDir
 	exec { msbuild $winformProjectFile /t:Build /p:Configuration=$buildTarget /v:quiet /p:OutDir=$buildExampleDir    } 
 }
 
 # Synopsis: Package-Restore
 task Package-Restore-Conic {
 
-	Push-Location  $buildRepoRooDir
-	$slnFile = Join-Path $buildRepoRooDir  $conf.SlnFile
+	Push-Location  $repoPath
+	$slnFile = Join-Path $repoPath  $conf.SlnFile
 	exec {  &$nuget restore $slnFile  }
 	Pop-Location
 
@@ -105,8 +105,8 @@ task Package-Restore-Conic {
 # Synopsis: Package-Restore
 task Package-Restore-Example {
 
-	Push-Location  $buildRepoRooDir
-	$slnFile = Join-Path $buildRepoRooDir  $conf.ExampleSlnFile
+	Push-Location  $repoPath
+	$slnFile = Join-Path $repoPath  $conf.ExampleSlnFile
 	exec {  &$nuget restore $slnFile  }
 	Pop-Location
 
@@ -118,7 +118,7 @@ task Marge-Conic  {
 	Write-Host "Marge Conic"
 	$src = $buildDir
 	$dst = $margeDir
-	Ensure-Dir-Exists-And-Is-Empty $dst
+	Ensure-DirExistsAndIsEmpty $dst
 	Push-Location  $src
 	& $libz inject-dll --assembly Conic.exe --include *.dll --move
 	Pop-Location
@@ -132,7 +132,7 @@ task Marge-Example  {
 	Write-Host "Marge example"
 	$src = $buildExampleDir
 	$dst = $margExampleDir
-	Ensure-Dir-Exists-And-Is-Empty $dst
+	Ensure-DirExistsAndIsEmpty $dst
 	Push-Location  $src
 	& $libz inject-dll --assembly Conic.Example.WinForm.exe --include *.dll --move
 	Pop-Location
@@ -144,18 +144,18 @@ task Marge-Example  {
 task Copy-To-Ready-Example  {	
 
 	$dst = $buildExampleReadyDir
-	Ensure-Dir-Exists-And-Is-Empty $dst
+	Ensure-DirExistsAndIsEmpty $dst
 	
 	$winformDir = "$dst/winform"
-	Ensure-Dir-Exists-And-Is-Empty $winformDir
+	Ensure-DirExistsAndIsEmpty $winformDir
 	cp  "$margExampleDir/Conic.Example.WinForm.exe" -Destination "$winformDir"
 
 	$extensionDir = "$dst/extension"
-	Ensure-Dir-Exists-And-Is-Empty $extensionDir
-	cp  "$buildRepoRooDir/src/Example/Conic.Example.ChromeExtension/app/*" -Recurse -Destination "$extensionDir"
+	Ensure-DirExistsAndIsEmpty $extensionDir
+	cp  "$repoPath/src/Example/Conic.Example.ChromeExtension/app/*" -Recurse -Destination "$extensionDir"
 
 	$conicDir = "$dst/conic"
-	Ensure-Dir-Exists-And-Is-Empty $conicDir
+	Ensure-DirExistsAndIsEmpty $conicDir
 	cp  "$margeDir/Conic.exe" -Destination "$conicDir"
 	cp  "$margeDir/NLog.config" -Destination "$conicDir"
 }
@@ -164,7 +164,7 @@ task Copy-To-Ready-Example  {
 task Copy-To-Ready-Conic  {	
 
 	$dst = $buildConicReadyDir
-	Ensure-Dir-Exists-And-Is-Empty $dst
+	Ensure-DirExistsAndIsEmpty $dst
 	cp  "$margeDir/Conic.exe" -Destination "$dst"
 	cp  "$margeDir/NLog.config" -Destination "$dst"
 }
@@ -219,18 +219,18 @@ task Prepare-Conic-Example-To-Work -If ($buildEnv -eq 'local') {
 # Synopsis: Make nuget file
 task Pack-Nuget  {
 
-	Ensure-Dir-Exists-And-Is-Empty $nugetTempDir
-	Ensure-Dir-Exists-And-Is-Empty $nugetDir
-	Ensure-Dir-Exists-And-Is-Empty "$nugetTempDir\tools"
+	Ensure-DirExistsAndIsEmpty $nugetTempDir
+	Ensure-DirExistsAndIsEmpty $nugetDir
+	Ensure-DirExistsAndIsEmpty "$nugetTempDir\tools"
 	
-	$spacFilePath = Join-Path $buildScriptsDir "nuget\Conic.nuspec"
+	$spacFilePath = Join-Path $scriptsPath "nuget\Conic.nuspec"
 	$specFileOutPath = Join-Path $nugetTempDir "Conic.nuspec"
 	
 	cp "$margeDir\Conic.exe" "$nugetTempDir\tools"
 	cp "$margeDir\NLog.config" "$nugetTempDir\tools"
     
     $spec = [xml](get-content $spacFilePath)
-    $spec.package.metadata.version = ([string]$spec.package.metadata.version).Replace("{Version}", $buildVs)
+    $spec.package.metadata.version = ([string]$spec.package.metadata.version).Replace("{Version}", $buildVersion.NuGetVersion)
     $spec.Save($specFileOutPath )
     exec { &$nuget pack $specFileOutPath -OutputDirectory $nugetDir }
 }
@@ -238,7 +238,7 @@ task Pack-Nuget  {
 # Synopsis: Make zip file.
 task Pack-To-Zip  {
 
-	Ensure-Dir-Exists-And-Is-Empty $packtDir
+	Ensure-DirExistsAndIsEmpty $packtDir
 	
 	$src = "$margeDir\Conic.exe"
 	$dst =  "$packtDir\conic.zip"
@@ -247,7 +247,7 @@ task Pack-To-Zip  {
 
 task Pack-To-Zip  {
 
-	Ensure-Dir-Exists-And-Is-Empty $packtDir
+	Ensure-DirExistsAndIsEmpty $packtDir
 	
 	$src = "$margeDir\Conic.exe"
 	$dst =  "$packtDir\conic.zip"
@@ -256,10 +256,10 @@ task Pack-To-Zip  {
 
 task Copy-Local -If ($buildEnv -eq 'local')  {
 
-	Ensure-Dir-Exists-And-Is-Empty $packtDir
+	Ensure-DirExistsAndIsEmpty $packtDir
 	
 	$src = "$margeDir\Conic.exe"
-	$dst =  "$buildRepoRooDir\stuff\working-version\"
+	$dst =  "$repoPath\stuff\working-version\"
     cp $src $dst -Force
 }
 # Synopsis: Do all
