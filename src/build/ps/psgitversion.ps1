@@ -262,8 +262,15 @@ function Get-GitCommitHash
 #>
 function Get-GitBranch
 {
-	 $revParse = Exec { git symbolic-ref --short -q HEAD } "Problem with git"
-	 if ($revParse -ne "HEAD") { return $revParse } 
+	
+	 try {
+		 $revParse = Exec { git symbolic-ref --short -q HEAD } "Problem with git"
+		 if ($revParse -ne "HEAD") { return $revParse } 
+	}
+	catch {
+
+	}
+	
 	 $revParse = Exec { git rev-parse --abbrev-ref HEAD } "Problem with git"
 	 if ($revParse -ne "HEAD") { return $revParse } 
 	 return "" 
