@@ -1,5 +1,5 @@
 version: 1.0.{build}
 build_script:
-- ps: .\src\build\bl.ps1 -buildGitBranch $env:APPVEYOR_REPO_BRANCH -buildEnv appveyor
+- ps: .\src\build\bl.ps1 -gitBranch $env:APPVEYOR_REPO_BRANCH -buildEnv appveyor
 test: off
 deploy: off
