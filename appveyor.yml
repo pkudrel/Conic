@@ -4,3 +4,9 @@ build_script:
 test: off
 deploy: off
 clone_depth: 20
+deploy:
+  provider: NuGet
+  api_key:
+    secure: hASCSp95jpkZYxTjTr8CFdMoWJEbgZDnr4Rle0k1aHlvgz+i5KZVp92ylzqgCXzC
+  skip_symbols: true
+  artifact: /.*\.nupkg/
