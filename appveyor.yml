@@ -9,5 +9,5 @@ deploy:
     secure: hASCSp95jpkZYxTjTr8CFdMoWJEbgZDnr4Rle0k1aHlvgz+i5KZVp92ylzqgCXzC
   skip_symbols: true
   artifact: C:\projects\conic\build-out\nuget\*.nupkg
- artifacts:
+artifacts:
   - path: '**\*.nupkg'
