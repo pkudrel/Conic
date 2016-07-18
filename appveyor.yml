@@ -4,4 +4,4 @@ build_script:
 test: off
 deploy: off
 clone_depth: 2
-
+shallow_clone: true
