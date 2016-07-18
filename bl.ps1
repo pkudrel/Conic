@@ -37,7 +37,7 @@ $ValueNamesToExport =@("repoPath", "configPath", "scriptsPath",
 # make 
 $config = Get-Content $configPath | Out-String | ConvertFrom-Json
 $v = ([PSCustomObject]$config.SemVer)
-$bv = Get-GitVersion $gitVersionStrategy $v.major $v.minor $v.patch $buildCounter $v.special  $buildEnv
+$bv = Get-GitVersion $gitVersionStrategy $v.major $v.minor $v.patch $buildCounter $v.special  $buildEnv $gitBranch
 $global:psgitversion = $bv 
 
 

@@ -13,7 +13,8 @@ function Get-GitVersion() {
 				[parameter(Mandatory=$false)] [int] $buildCounter = 0,
 				[parameter(Mandatory=$false)] [string] $special = "",
 				[parameter(Mandatory=$false)] [string] $buildEnv = "",
-				[parameter(Mandatory=$false)] [int] $private = 0
+				[parameter(Mandatory=$false)] [int] $private = 0,
+				[parameter(Mandatory=$false)] [string] $gitBranch = ""
 			)
  	
 
@@ -70,11 +71,12 @@ function Get-GitVersion() {
 	$commitNumberPad = "{0:D4}" -f $commitNumber
 	
 	#branch 
-	$branch = Get-GitBranch
-	$branch = if ($branch -ne "") { $branch } else {  $buildEnv  }
+
+	$gitBranch = if ($gitBranch -ne "") { $gitBranch } else {  Get-GitBranch  }
+	$gitBranch = if ($gitBranch -ne "") { $gitBranch } else {  $buildEnv  }
 
 	#label 
-	$label = if ($special -ne "") { $special } else { $branch }
+	$label = if ($special -ne "") { $special } else { $gitBranch }
 	$preReleaseTag = "$label.$commitNumber" 
 	
 	#tag
@@ -95,7 +97,7 @@ function Get-GitVersion() {
 	$NuGetVersionExtend = if ($nugetSpacialExt -eq "") { "$majorMinorPatch-build$buildCounter" } else {  $NuGetVersion  } 
 
 	#InformationalVersion 
-	$fullBuildMetaData = "BuildCounter.$buildCounter.Branch.$branch.DateTime.$dateTime.Env.$buildEnv.Sha.$sha.CommitsCounter.$commitNumber"
+	$fullBuildMetaData = "BuildCounter.$buildCounter.Branch.$gitBranch.DateTime.$dateTime.Env.$buildEnv.Sha.$sha.CommitsCounter.$commitNumber"
 	$informationalVersion = "$semVer+$fullBuildMetaData";
 
 
@@ -104,7 +106,7 @@ function Get-GitVersion() {
 	"AssemblyVersion" = "$major.$minor.0.0"; "AssemblyFileVersion" = "$major.$minor.$buildCounter.0"; "AssemblyInformationalVersion" = $informationalVersion;
 	"SemVer" = "$semVer" ; "SemVerExtend" = $semVerExtend; "SemVerAssembly" = "$major.$minor.$patch.0"; 
 	"MajorMinorPatch" = "$major.$minor.$patch";"MajorMinorPatchPrivate" = "$major.$minor.$patch.$private"; "MajorMinorBuild" =   "$major.$minor.$buildCounter";
-	"BranchName" = $branch; "Tag" = $tag; 
+	"BranchName" = $gitBranch; "Tag" = $tag; 
 	"Label" = $label ; 
 	"FullBuildMetaData" = "$fullBuildMetaData";
 
@@ -280,9 +282,9 @@ function Get-GitCommitHash
 #>
 function Get-GitBranch
 {
-	 $revParse = Exec { git symbolic-ref --short -q HEAD } "Problem with git"
-	 if ($revParse -ne "HEAD") { return $revParse } 
 	 $revParse = Exec { git rev-parse --abbrev-ref HEAD } "Problem with git"
+	 if ($revParse -ne "HEAD") { return $revParse } 
+	 $revParse = Exec { git symbolic-ref --short -q HEAD } "Problem with git"
 	 if ($revParse -ne "HEAD") { return $revParse } 
 	 return "" 
 }
