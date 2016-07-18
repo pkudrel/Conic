@@ -128,7 +128,7 @@ function Exec {
         [Parameter(Mandatory=$true, Position=0)][scriptblock]$Command,
         [Parameter(Mandatory=$false, Position=1)][string]$ErrorMessage = ("Failed executing {0}" -F $Command)
     )
-
+	Write-Host "Command: $Command"
     & $Command
     if ($LASTEXITCODE -ne 0) {
         throw ("Exec: " + $ErrorMessage)
