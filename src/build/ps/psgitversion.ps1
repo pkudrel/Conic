@@ -6,30 +6,60 @@
 #>
 function Get-GitVersion() {
 		param(
+				[parameter(Mandatory=$true)] [ValidateSet('standard','fromBuildCounterMMP','fromBuildCounterMMPP')] [string] $strategy = "standard",
 				[parameter(Mandatory=$false)] [int] $major = 0,
 				[parameter(Mandatory=$false)] [int] $minor = 0,
 				[parameter(Mandatory=$false)] [int] $patch = 0,
-				[parameter(Mandatory=$false)] [int] $build = 0,
+				[parameter(Mandatory=$false)] [int] $buildCounter = 0,
 				[parameter(Mandatory=$false)] [string] $special = "",
-				[parameter(Mandatory=$false)] [string] $env = ([Environment]::MachineName),
-				[parameter(Mandatory=$false)] [int] $private = 0
+				[parameter(Mandatory=$false)] [string] $buildEnv = "",
+				[parameter(Mandatory=$false)] [int] $private = 0,
+				[parameter(Mandatory=$false)] [string] $gitBranch = ""
 			)
+ 	
 
-
-	# build number < 0			
-	$build = if ($build -le 0) { Get-LocalBuildNumber } else { $build }
+	# set build ENV if needed
+	$buildEnv = if ($buildEnv -eq "") { [Environment]::MachineName } else {  $buildEnv  }
+	
+	# build Counter < 0			
+	$buildCounter = if ($buildCounter -le 0) { Get-LocalBuildNumber } else { $buildCounter }
 
 
 	# magic MagicMajorMinorPatchPrivate form build number			
-	$magic = Get-MagicMajorMinorPatchPrivate $build
+	$magic = Get-MagicMajorMinorPatchPrivate $buildCounter
+	$magicSimple = Get-MagicMajorMinorPatch $buildCounter
 
-	# if all important items are equal zero use magic
-	if ( ($major -eq 0) -and ($minor -eq 0) -and ($patch -eq 0) -and ($private -eq 0) ){
-		$major = $magic.Major;
-		$minor = $magic.Minor;
-		$patch = $magic.Patch;
-		$private = $magic.Private;
+
+	switch ($strategy) {
+		standard { 
+			# if all important items are equal zero - use magic simple
+			if ( ($major -eq 0) -and ($minor -eq 0) -and ($patch -eq 0) -and ($private -eq 0) ){
+				$major = $magicSimple.Major;
+				$minor = $magicSimple.Minor;
+				$patch = $magicSimple.Patch;
+				$private = 0;
+			}
+			break     
+		}
+		fromBuildCounterMMP {
+				$major = $magicSimple.Major;
+				$minor = $magicSimple.Minor;
+				$patch = $magicSimple.Patch;
+				$private = 0;
+		break
+		}
+		fromBuildCounterMMPP {
+				$major = $magic.Major;
+				$minor = $magic.Minor;
+				$patch = $magic.Patch;
+				$private = $magic.Private;
+			break
+		}
+		default {
+			throw "No matching strategy: $strategy"
+		}
 	}
+
 
 
 	#hash and time				
@@ -41,11 +71,11 @@ function Get-GitVersion() {
 	$commitNumberPad = "{0:D4}" -f $commitNumber
 	
 	#branch 
-	$branch = Get-GitBranch
-	$branch = if ($branch -ne "") { $branch } else {  $env  }
+	$gitBranch = if ($gitBranch -ne "") { $gitBranch } else {  Get-GitBranch  }
+	$gitBranch = if ($gitBranch -ne "") { $gitBranch } else {  $buildEnv  }
 
 	#label 
-	$label = if ($special -ne "") { $special } else { $branch }
+	$label = if ($special -ne "") { $special } else { $gitBranch }
 	$preReleaseTag = "$label.$commitNumber" 
 	
 	#tag
@@ -58,27 +88,24 @@ function Get-GitVersion() {
 	#SemVer 
 	$semVer = "$majorMinorPatch"
 	$semVer  = if ($special -ne "") { "$semVer-$special" } else {  "$semVer"  }
-	$semVerExtend  = if ($special -ne "") { "$majorMinorPatch-$special+$build" } else {  "$majorMinorPatch+$build"  }
+	$semVerExtend  = if ($special -ne "") { "$majorMinorPatch-$special+$buildCounter" } else {  "$majorMinorPatch+$buildCounter"  }
 	
 	#NuGetVersion
 	$nugetSpacialExt = [string]$special.Replace(".","").Replace("-","")
 	$NuGetVersion =   if ($nugetSpacialExt -ne "") { "$majorMinorPatch-$nugetSpacialExt" } else {  $majorMinorPatch  }
-	$NuGetVersionExtend = if ($nugetSpacialExt -eq "") { "$majorMinorPatch-build$build" } else {  $NuGetVersion  } 
+	$NuGetVersionExtend = if ($nugetSpacialExt -eq "") { "$majorMinorPatch-build$buildCounter" } else {  $NuGetVersion  } 
 
 	#InformationalVersion 
-	$fullBuildMetaData = "Build.$build.Branch.$branch.DateTime.$dateTime.Env.$env.Sha.$sha.CommitsCounter.$commitNumber"
+	$fullBuildMetaData = "BuildCounter.$buildCounter.Branch.$gitBranch.DateTime.$dateTime.Env.$buildEnv.Sha.$sha.CommitsCounter.$commitNumber"
 	$informationalVersion = "$semVer+$fullBuildMetaData";
 
 
-    
-
-
 	 $result = [PSCustomObject]  @{
-	"Major"= $major; "Minor"= $minor; "Patch" = $patch; "Build" = $build; "Special" = $special; "Env" = $env; "Private" = $private;
-	"AssemblyVersion" = "$major.$minor.0.0"; "AssemblyFileVersion" = "$major.$minor.$build.0"; "AssemblyInformationalVersion" = $informationalVersion;
+	"Major"= $major; "Minor"= $minor; "Patch" = $patch; "BuildCounter" = $buildCounter; "Special" = $special; "Env" = $buildEnv; "Private" = $private;
+	"AssemblyVersion" = "$major.$minor.0.0"; "AssemblyFileVersion" = "$major.$minor.$buildCounter.0"; "AssemblyInformationalVersion" = $informationalVersion;
 	"SemVer" = "$semVer" ; "SemVerExtend" = $semVerExtend; "SemVerAssembly" = "$major.$minor.$patch.0"; 
-	"MajorMinorPatch" = "$major.$minor.$patch";"MajorMinorPatchPrivate" = "$major.$minor.$patch.$private"; "MajorMinorBuild" =   "$major.$minor.$build";
-	"BranchName" = $branch; "Tag" = $tag; 
+	"MajorMinorPatch" = "$major.$minor.$patch";"MajorMinorPatchPrivate" = "$major.$minor.$patch.$private"; "MajorMinorBuild" =   "$major.$minor.$buildCounter";
+	"BranchName" = $gitBranch; "Tag" = $tag; 
 	"Label" = $label ; 
 	"FullBuildMetaData" = "$fullBuildMetaData";
 
@@ -87,35 +114,8 @@ function Get-GitVersion() {
 	"CommitsCounter" = $commitNumber ; "CommitsCounterPad" = $commitNumberPad;  "CommitsDateTime" = "$dateTime";
 	"Sha" = "$sha" ; 
 	"BuildMagicNumber" = "$($magic.Major).$($magic.Minor).$($magic.Patch).$($magic.Private)";
-	
-	
-	
+	"BuildMagicShortNumber" = "$($magicSimple.Major).$($magicSimple.Minor).$($magicSimple.Patch)"
 	}
-
-
-	#if ($env:APPVEYOR) { $build = "$buildCommitNumber"}
-	#ElseIf ($env:TEAMCITY_VERSION) {
-	#	$host.UI.RawUI.BufferSize = New-Object System.Management.Automation.Host.Size(8192,50)
-	#	$build = "$buildCounter" 	} 
-	#else {
-	#	$build = Get-LocalBuildVersion  $filePath
-	#	$semver.special = $semver.special + $env
-	#}
-
-	#$result.Build = $build
-	#$result.Sem = ("{0}.{1}.{2}" -f $semver.major, $semver.minor, $semver.patch)	
-
-	#if ($semver.special  -ne ""){
-	#	$result.Sem = ("{0}-{1}" -f $result.Sem, $semver.special)	
-	#}
-	#$result.Sem = ("{0}.{1}" -f $result.Sem, $build)	 
-
-
-	#if ($env:TEAMCITY_VERSION) {
-	#	$s  = $result.Sem;
-	#	Write-Host  "##teamcity[buildNumber '$s']"
-	#}
-
 	return $result
 }
 
@@ -220,17 +220,37 @@ function Get-GitRepoRoot
 function Get-MagicMajorMinorPatchPrivate {
 	
 		param(
-				[parameter(Mandatory=$true)] [int] $build
+				[parameter(Mandatory=$true)] [int] $buildCounter
 			)
 
 			$r = [PSCustomObject]  @{"Major" = 0; "Minor" = 0; "Patch" = 0; "Private" = 0}
-			$r.Major =  [math]::floor($build / 1000 )
-			$rest =  ($build - ($r.Major * 1000))
+			$r.Major =  [math]::floor($buildCounter / 1000 )
+			$rest =  ($buildCounter - ($r.Major * 1000))
 			$r.Minor =  [math]::floor($rest/100)
 			$rest =  ($rest - ($r.Minor * 100))
 			$r.Patch =  [math]::floor($rest / 10 ) 
 			$rest =  ($rest - ($r.Patch * 10))
 			$r.Private =  [math]::floor( $rest / 1 ) 
+			return $r
+}
+
+
+<#
+.Synopsis
+	Get "magic"  Major, Minor, Patch number from build
+#>
+function Get-MagicMajorMinorPatch {
+	
+		param(
+				[parameter(Mandatory=$true)] [int] $buildCounter
+			)
+
+			$r = [PSCustomObject]  @{"Major" = 0; "Minor" = 0; "Patch" = 0;}
+			$r.Major =  [math]::floor($buildCounter / 100 )
+			$rest =  ($buildCounter - ($r.Major * 100))
+			$r.Minor =  [math]::floor($rest/10)
+			$rest =  ($rest - ($r.Minor * 10))
+			$r.Patch =  [math]::floor($rest / 1 ) 
 			return $r
 }
 
@@ -261,9 +281,9 @@ function Get-GitCommitHash
 #>
 function Get-GitBranch
 {
-	 $revParse = Exec { git symbolic-ref --short -q HEAD } "Problem with git"
-	 if ($revParse -ne "HEAD") { return $revParse } 
 	 $revParse = Exec { git rev-parse --abbrev-ref HEAD } "Problem with git"
+	 if ($revParse -ne "HEAD") { return $revParse } 
+	 $revParse = Exec { git symbolic-ref --short -q HEAD } "Problem with git"
 	 if ($revParse -ne "HEAD") { return $revParse } 
 	 return "" 
 }
@@ -276,7 +296,7 @@ function Get-GitTag
 {
 	$describeTags = ""
 	try {
-		$describeTags = Exec { git describe --tags } "Problem with git"
+		$describeTags = Exec { git for-each-ref refs/tags --sort=-taggerdate --format='%(refname:short)' --count=1 } "Problem with git"
 	}	
 	catch {
 	 
