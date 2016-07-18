@@ -71,7 +71,6 @@ function Get-GitVersion() {
 	$commitNumberPad = "{0:D4}" -f $commitNumber
 	
 	#branch 
-
 	$gitBranch = if ($gitBranch -ne "") { $gitBranch } else {  Get-GitBranch  }
 	$gitBranch = if ($gitBranch -ne "") { $gitBranch } else {  $buildEnv  }
 
