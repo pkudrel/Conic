@@ -128,9 +128,8 @@ function Exec {
         [Parameter(Mandatory=$true, Position=0)][scriptblock]$Command,
         [Parameter(Mandatory=$false, Position=1)][string]$ErrorMessage = ("Failed executing {0}" -F $Command)
     )
-	Write-Host "Command: $Command"
+
     & $Command
-	Write-Host "LASTEXITCODE: $LASTEXITCODE"
     if ($LASTEXITCODE -ne 0) {
         throw ("Exec: " + $ErrorMessage)
     }
@@ -262,7 +261,8 @@ function Get-GitCommitHash
 #>
 function Get-GitBranch
 {
-	
+	 $revParse = Exec { git symbolic-ref --short -q HEAD } "Problem with git"
+	 if ($revParse -ne "HEAD") { return $revParse } 
 	 $revParse = Exec { git rev-parse --abbrev-ref HEAD } "Problem with git"
 	 if ($revParse -ne "HEAD") { return $revParse } 
 	 return "" 
