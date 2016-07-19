@@ -49,7 +49,6 @@ namespace Conic
             }
             else
             {
-                     Console.WriteLine("start ");
                 using (singleGlobalInstance)
                 {
                     var result   = startUp.GetConfig();
