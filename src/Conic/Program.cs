@@ -27,7 +27,27 @@ namespace Conic
 
             var startUp = new StartUp();
 
-            if (args.Any())
+
+            _log.Info($"Number args: {args.Length}");
+            var arg = string.Join(";", args);
+            if (arg.Contains("parent-window"))
+            {
+                using (singleGlobalInstance)
+                {
+                    var res = startUp.GetConfig();
+                    if (res.Item1)
+                    {
+                        var ws = new WormholeService(res.Item2.PipeName);
+                        ws.StartServer();
+                    }
+                    else
+                    {
+                        if (!Environment.UserInteractive) return;
+                        Console.WriteLine("Config file not found.");
+                    }
+                }
+            }
+            else if (args.Any())
             {
                 var sb = new StringBuilder();
                 var writer = new StringWriter(sb);
@@ -45,25 +65,6 @@ namespace Conic
                     .WithParsed<ManifestOptions>(opts => { startUp.CreateManifest(opts); })
                     .WithParsed<ConfigOptions>(opts => { startUp.CreateConfig(opts); })
                     .WithNotParsed(opts => { WriteErrors(sb); });
-                ;
-            }
-            else
-            {
-                using (singleGlobalInstance)
-                {
-                    var result   = startUp.GetConfig();
-                    if (result.Item1)
-                    {
-                        var ws = new WormholeService(result.Item2.PipeName);
-                        ws.StartServer();
-                    }
-                    else
-                    {
-                        if (!Environment.UserInteractive) return;
-                        Console.WriteLine("Config file not found.");
-       
-                    }
-                }
             }
         }
 
@@ -74,6 +75,7 @@ namespace Conic
             r[1] = "Copyright (c) 2016 Piotr Kudrel";
             foreach (var s in r)
             {
+                _log.Info(s);
                 Console.Error.WriteLine(s);
             }
         }

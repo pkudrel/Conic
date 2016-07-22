@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Args\ChromeOptions.cs" />
     <Compile Include="Args\ConfigOptions.cs" />
     <Compile Include="Manifest\HostDefinitionValidator.cs" />
     <Compile Include="Manifest\ManifestService.cs" />
