@@ -77,7 +77,7 @@ function Get-MagicNumber {
 				[parameter(Mandatory=$true)] [int] $patch,
 				[parameter(Mandatory=$true)] [int] $private,
 				[parameter(Mandatory=$true)] [int] $buildCounter,
-				[parameter(Mandatory=$true)] [ValidateSet('standard','fromBuildCounterMMP','combinateMajorAndBuildSlice3')] [string] $strategy = "standard"
+				[parameter(Mandatory=$true)] [ValidateSet('standard','fromBuildCounterMMP','combinateMajorAndBuildSlice3','defaultOrCombinateMajorAndBuildSlice3')] [string] $strategy = "standard"
 			)
 
 			$r = [PSCustomObject]  @{"Major" = 0; "Minor" = 0; "Patch" = 0;}
@@ -117,7 +117,7 @@ function Get-MagicNumber {
 						break;     
 					}
 					fromBuildCounterMMP {
-						$res1.MagicVersion = $res["buildMajorMinorPatchBySlice3"]
+						$res1.MagicVersion = $res["buildMajor100Minor10Patch1"]
 						$res1.MagicVersionExtend = Get-ExtendVersion $res1.MagicVersion $private;
 						break;
 					}
@@ -142,6 +142,6 @@ function Get-MagicNumber {
 					}
 				}
 
-		
+				
 			return   $res1
 }
