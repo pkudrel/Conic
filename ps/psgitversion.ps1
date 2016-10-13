@@ -233,6 +233,66 @@ function Get-MagicMajorMinorPatchPrivate {
 			$r.Private =  [math]::floor( $rest / 1 ) 
 			return $r
 }
+<#
+.Synopsis
+	Get "magic"  Major, Minor, Patch, Private number from build
+#>
+
+function Get-MagicNumber {
+	
+		param(
+			    [parameter(Mandatory=$true)] [int] $major,
+				[parameter(Mandatory=$true)] [int] $minor,
+				[parameter(Mandatory=$true)] [int] $patch,
+				[parameter(Mandatory=$true)] [int] $private,
+				[parameter(Mandatory=$true)] [int] $buildCounter,
+				[parameter(Mandatory=$true)] [ValidateSet('standard','fromBuildCounterMMP','fromBuildCounterMMPP')] [string] $strategy = "standard"
+			)
+
+			$r = [PSCustomObject]  @{"Major" = 0; "Minor" = 0; "Patch" = 0; "Private" = 0}
+
+			switch ($strategy) {
+					standard { 
+						# if all important items are equal zero - use magic simple
+						if ( ($major -eq 0) -and ($minor -eq 0) -and ($patch -eq 0) -and ($private -eq 0) ){
+							$major = $magicSimple.Major;
+							$minor = $magicSimple.Minor;
+							$patch = $magicSimple.Patch;
+							$private = 0;
+						}
+						break     
+					}
+					fromBuildCounterMMP {
+							$major = $magicSimple.Major;
+							$minor = $magicSimple.Minor;
+							$patch = $magicSimple.Patch;
+							$private = 0;
+					break
+					}
+					fromBuildCounterMMPP {
+							$major = $magic.Major;
+							$minor = $magic.Minor;
+							$patch = $magic.Patch;
+							$private = $magic.Private;
+						break
+					}
+					default {
+						$r.Major = $major;
+						$r.Minor = $minor;
+						$r.Patch = $patch;
+						$r.Private = $private;
+					}
+				}
+
+			$r.Major =  [math]::floor($buildCounter / 1000 )
+			$rest =  ($buildCounter - ($r.Major * 1000))
+			$r.Minor =  [math]::floor($rest/100)
+			$rest =  ($rest - ($r.Minor * 100))
+			$r.Patch =  [math]::floor($rest / 10 ) 
+			$rest =  ($rest - ($r.Patch * 10))
+			$r.Private =  [math]::floor( $rest / 1 ) 
+			return $r
+}
 
 
 <#
