@@ -26,7 +26,7 @@ param(
 		$buildSpecial = $( if ($psGitVersionConfig.Special -ne $null) { $psGitVersionConfig.Special } else {""} ),
 		$psGitVersionStrategy = $( if ($psGitVersionConfig.Strategy -ne $null) { $psGitVersionConfig.Strategy } else {"standard"} ),
 		$buildDateTime = ((Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")),
-		$gitCommitNumber = 0,
+		$gitCommitNumber = 0, 
 		$gitBranch = "",
 		$ib = (Join-Path $scriptsPath "\tools\ib\Invoke-Build.ps1")
     )
