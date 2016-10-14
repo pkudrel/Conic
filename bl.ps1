@@ -44,7 +44,7 @@ $ValueNamesToExport =@("repoPath", "configPath", "scriptsPath",
 
 # make 
 
-$bv = Get-GitVersion $psGitVersionStrategy $buildMajor $buildMinor $buildPatch $buildCounter $v.Special $buildEnv $gitBranch
+$bv = Get-GitVersion $psGitVersionStrategy $buildMajor $buildMinor $buildPatch $buildCounter $buildSpecial $buildEnv $gitBranch
 $global:psgitversion = $bv 
 
 
