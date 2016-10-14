@@ -31,7 +31,6 @@ param(
 		$ib = (Join-Path $scriptsPath "\tools\ib\Invoke-Build.ps1")
     )
 
-
 $ValueNamesToExport =@("repoPath", "configPath", "scriptsPath",
  "toolsPath", "buildEnv", "buildTarget",  "buildPath","buildNumber", "gitCommitNumber",
  "buildDateTime" , "gitBranch", "buildMiscInfo")
