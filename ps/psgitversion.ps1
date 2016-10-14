@@ -10,7 +10,7 @@
 
 function Get-GitVersion() {
 		param(
-				[parameter(Mandatory=$true)] [ValidateSet('standard','fromBuildCounterMMP','combinateMajorAndBuildSlice3')] [string] $strategy = "standard",
+				[parameter(Mandatory=$true)] [ValidateSet('standard','fromBuildCounterMMP','combinateMajorAndBuildSlice3', 'standardOrCombinateMajorAndBuildSlice3')] [string] $strategy = "standard",
 				[parameter(Mandatory=$false)] [int] $major = 0,
 				[parameter(Mandatory=$false)] [int] $minor = 0,
 				[parameter(Mandatory=$false)] [int] $patch = 0,

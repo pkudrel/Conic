@@ -21,7 +21,7 @@ param(
 		$buildDateTime = ((Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")),
 		$gitCommitNumber = 0,
 		$gitBranch = "",
-		$gitVersionStrategy = "standard",
+		$gitVersionStrategy = "standardOrCombinateMajorAndBuildSlice3",
 		$ib = (Join-Path $scriptsPath "\tools\ib\Invoke-Build.ps1")
     )
 
