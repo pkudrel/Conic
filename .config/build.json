@@ -1,11 +1,9 @@
 {
-  "ProductName": "Conic",
-  "CompanyName": "DenebLab",
-  "Copyright": "Copyright (c) 2016 Piotr Kudrel, DenebLab",
-  "SemVer": {
-    "major": 1,
-    "minor": 0,
-    "patch": 1,
-    "special": ""
+  "PsGitVersion": {
+    "Strategy": "combinateMajorAndBuildSlice3",
+    "Major": 1,
+    "Minor": 0,
+    "Patch": 0,
+    "Special": ""
   }
 }
