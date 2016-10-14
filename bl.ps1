@@ -24,11 +24,10 @@ param(
 		$buildMinor = $( if ($psGitVersionConfig.Minor -ne $null) { $psGitVersionConfig.Minor } else {0} ),
 		$buildPatch =  $( if ($psGitVersionConfig.Patch -ne $null) { $psGitVersionConfig.Patch } else {0} ),
 		$buildSpecial = $( if ($psGitVersionConfig.Special -ne $null) { $psGitVersionConfig.Special } else {""} ),
+		$psGitVersionStrategy = $( if ($psGitVersionConfig.Strategy -ne $null) { $psGitVersionConfig.Strategy } else {"standard"} ),
 		$buildDateTime = ((Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")),
 		$gitCommitNumber = 0,
 		$gitBranch = "",
-		
-		$psGitVersionStrategy = "standard",
 		$ib = (Join-Path $scriptsPath "\tools\ib\Invoke-Build.ps1")
     )
 
