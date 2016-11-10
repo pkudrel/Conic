@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #CONIC	  
 ###ChrOme Native messagIng Connector
 ###### Name generate with http://acronymcreator.net/ace.py
@@ -25,4 +24,4 @@ git subtree pull --prefix=src/build ps-auto-helpers master --squash
 
 ```
 
->>>>>>> ps-auto-helpers/master
+
