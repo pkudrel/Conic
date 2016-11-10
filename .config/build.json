@@ -1,22 +1,9 @@
 {
-  "ProductName": "Conic - Chrome native messaging connector",
-  "CompanyName": "DenebLab",
-  "Copyright": "Copyright (c) 2016 Piotr Kudrel",
-  "SemVer": {
-    "major": 1,
-    "minor": 0,
-    "patch": 3,
-    "special": ""
-  },
-  "BuildProjectDirPath": "\\src\\build",
-  "ProjectFile": "\\src\\Conic\\Conic.csproj",
-  "SlnFile": "\\src\\Conic.sln",
-  "SrcDir": "\\src",
-  "PackagesDir": "\\src\\packages",
-  "ExampleSlnFile": "\\src\\Example\\Conic.Example.sln",
-  "Libz": "\\src\\packages\\LibZ.Tool\\tools\\libz.exe",
-  "Nuget": "\\tools\\nuget\\nuget.exe",
-  "Zip": "\\tools\\7zip\\7za.exe",
-  "Gitversion": "\\src\\packages\\gitversion.commandline\\tools\\gitversion.exe"
-
+  "PsGitVersion": {
+    "Strategy": "combinateMajorAndBuildSlice3",
+    "Major": 1,
+    "Minor": 0,
+    "Patch": 0,
+    "Special": ""
+  }
 }

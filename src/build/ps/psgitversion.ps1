@@ -4,9 +4,13 @@
 	Minor: New features, but backwards compatible.
 	Patch: Backwards compatible bug fixes only.
 #>
+
+# Import magic
+. (Join-Path $PSScriptRoot "magicnumber.ps1")
+
 function Get-GitVersion() {
 		param(
-				[parameter(Mandatory=$true)] [ValidateSet('standard','fromBuildCounterMMP','fromBuildCounterMMPP')] [string] $strategy = "standard",
+				[parameter(Mandatory=$true)] [ValidateSet('standard','fromBuildCounterMMP','combinateMajorAndBuildSlice3', 'standardOrCombinateMajorAndBuildSlice3')] [string] $strategy = "standard",
 				[parameter(Mandatory=$false)] [int] $major = 0,
 				[parameter(Mandatory=$false)] [int] $minor = 0,
 				[parameter(Mandatory=$false)] [int] $patch = 0,
@@ -17,6 +21,7 @@ function Get-GitVersion() {
 				[parameter(Mandatory=$false)] [int] $private = 0
 			)
  	
+	#Write-Host "Arguments: major: $major; minor: $minor; patch: $patch; buildCounter: $buildCounter; strategy: $strategy  "
 
 	# set build ENV if needed
 	$buildEnv = if ($buildEnv -eq "") { [Environment]::MachineName } else {  $buildEnv  }
@@ -25,40 +30,15 @@ function Get-GitVersion() {
 	$buildCounter = if ($buildCounter -le 0) { Get-LocalBuildNumber } else { $buildCounter }
 
 
-	# magic MagicMajorMinorPatchPrivate form build number			
-	$magic = Get-MagicMajorMinorPatchPrivate $buildCounter
-	$magicSimple = Get-MagicMajorMinorPatch $buildCounter
-
-
-	switch ($strategy) {
-		standard { 
-			# if all important items are equal zero - use magic simple
-			if ( ($major -eq 0) -and ($minor -eq 0) -and ($patch -eq 0) -and ($private -eq 0) ){
-				$major = $magicSimple.Major;
-				$minor = $magicSimple.Minor;
-				$patch = $magicSimple.Patch;
-				$private = 0;
-			}
-			break     
-		}
-		fromBuildCounterMMP {
-				$major = $magicSimple.Major;
-				$minor = $magicSimple.Minor;
-				$patch = $magicSimple.Patch;
-				$private = 0;
-		break
-		}
-		fromBuildCounterMMPP {
-				$major = $magic.Major;
-				$minor = $magic.Minor;
-				$patch = $magic.Patch;
-				$private = $magic.Private;
-			break
-		}
-		default {
-			throw "No matching strategy: $strategy"
-		}
-	}
+	# magic MagicMajorMinorPatchPrivate form build number		
+	$magicVersion =   (Get-MagicNumber $major $minor $patch $private $buildCounter $strategy)	
+	$magic = $magicVersion.MagicVersionExtend
+	$magicSimple = $magicVersion.MagicVersion
+	
+	$major = $magic.Major;
+	$minor = $magic.Minor;
+	$patch = $magic.Patch;
+	$private = $magic.Private;
 
 
 
@@ -213,46 +193,11 @@ function Get-GitRepoRoot
 	 $path = Exec { git rev-parse --show-toplevel } "Problem with git"
 	 return $path 
 }
-<#
-.Synopsis
-	Get "magic"  Major, Minor, Patch, Private number from build
-#>
-function Get-MagicMajorMinorPatchPrivate {
-	
-		param(
-				[parameter(Mandatory=$true)] [int] $buildCounter
-			)
-
-			$r = [PSCustomObject]  @{"Major" = 0; "Minor" = 0; "Patch" = 0; "Private" = 0}
-			$r.Major =  [math]::floor($buildCounter / 1000 )
-			$rest =  ($buildCounter - ($r.Major * 1000))
-			$r.Minor =  [math]::floor($rest/100)
-			$rest =  ($rest - ($r.Minor * 100))
-			$r.Patch =  [math]::floor($rest / 10 ) 
-			$rest =  ($rest - ($r.Patch * 10))
-			$r.Private =  [math]::floor( $rest / 1 ) 
-			return $r
-}
 
 
-<#
-.Synopsis
-	Get "magic"  Major, Minor, Patch number from build
-#>
-function Get-MagicMajorMinorPatch {
-	
-		param(
-				[parameter(Mandatory=$true)] [int] $buildCounter
-			)
 
-			$r = [PSCustomObject]  @{"Major" = 0; "Minor" = 0; "Patch" = 0;}
-			$r.Major =  [math]::floor($buildCounter / 100 )
-			$rest =  ($buildCounter - ($r.Major * 100))
-			$r.Minor =  [math]::floor($rest/10)
-			$rest =  ($rest - ($r.Minor * 10))
-			$r.Patch =  [math]::floor($rest / 1 ) 
-			return $r
-}
+
+
 
 <#
 .Synopsis
