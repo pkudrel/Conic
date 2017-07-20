@@ -7,7 +7,7 @@
   "PackagesDir": "\\src\\packages",
   "Libz": "\\src\\packages\\LibZ.Tool\\tools\\libz.exe",
   "PsGitVersion": {
-    "Strategy": "combinateMajorAndBuildSlice3",
+    "Strategy": "default",
     "Major": 1,
     "Minor": 0,
     "Patch": 4,
