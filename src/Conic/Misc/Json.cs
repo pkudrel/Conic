@@ -42,7 +42,7 @@ namespace Conic.Misc
         /// </summary>
         public static T Deserialize(string json)
         {
-            using (var stream = new MemoryStream(Encoding.Default.GetBytes(json)))
+            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(json)))
             {
                 var serializer = new DataContractJsonSerializer(typeof(T));
                 return serializer.ReadObject(stream) as T;
@@ -61,7 +61,7 @@ namespace Conic.Misc
             using (var stream = new MemoryStream())
             {
                 serializer.WriteObject(stream, obj);
-                var txt = Encoding.Default.GetString(stream.ToArray())
+                var txt = Encoding.UTF8.GetString(stream.ToArray())
                     .Replace(@"\/", "/"); //Ugly hack 
                 return FormatJson(txt);
             }

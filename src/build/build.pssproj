@@ -30,7 +30,6 @@
     <Compile Include="bl.ps1" />
     <Compile Include="default.ps1" />
     <Compile Include="nuget\Conic.nuspec" />
-    <Compile Include="ps\misc.ps1" />
     <Compile Include="ps\psgitversion.ps1" />
   </ItemGroup>
   <ItemGroup>

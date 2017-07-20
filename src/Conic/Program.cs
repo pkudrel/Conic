@@ -72,7 +72,7 @@ namespace Conic
         {
             var r = sb.ToString().Split(new[] {Environment.NewLine}, StringSplitOptions.None);
             r[0] = "Conic - Chrome native messaging connector";
-            r[1] = "Copyright (c) 2016 Piotr Kudrel";
+            r[1] = "Copyright (c) 2017 Piotr Kudrel";
             foreach (var s in r)
             {
                 _log.Info(s);
