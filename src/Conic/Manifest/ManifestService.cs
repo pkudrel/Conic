@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Text;
 using Conic.Misc;
 using NLog;
 using Registry = Microsoft.Win32.Registry;
@@ -9,7 +10,7 @@ namespace Conic.Manifest
     {
         private const string _MANIFEST_COMPANY_NAME = @"default.conic.host";
         private const string _MANIFEST_COMMUNICATION_TYPE = @"stdio";
-      
+
         private const string _CHROME_EXTENSION_REGISTRY_KEY =
             @"HKEY_CURRENT_USER\SOFTWARE\Google\Chrome\NativeMessagingHosts";
 
@@ -63,7 +64,7 @@ namespace Conic.Manifest
                 _MANIFEST_COMMUNICATION_TYPE,
                 extensionId);
             var src = Json<MessagingHostDefinition>.Serialize(definition);
-            File.WriteAllText(_pathToManifestFile, src);
+            File.WriteAllText(_pathToManifestFile, src, Encoding.UTF8);
             _log.Trace($"Manifest file path: {_pathToManifestFile}; Name: '{definition.Name}'");
             _log.Trace("Updating registry.");
             UpdateRegistry(_pathToManifestFile, name);
