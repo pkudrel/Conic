@@ -35,9 +35,13 @@ $ValueNamesToExport =@("repoPath", "configPath", "scriptsPath",
  "toolsPath", "buildEnv", "buildTarget",  "buildPath","buildNumber", "gitCommitNumber",
  "buildDateTime" , "gitBranch", "buildMiscInfo")
 
- # tools
-. (Join-Path $scriptsPath "ps\misc.ps1")
-. (Join-Path $scriptsPath "ps\psgitversion.ps1")
+# inser tools
+. (Join-Path $scriptsPath "vendor\ps-auto-helpers\ps\misc.ps1")
+. (Join-Path $scriptsPath "vendor\ps-auto-helpers\ps\io.ps1")
+. (Join-Path $scriptsPath "vendor\ps-auto-helpers\ps\assembly-tools.ps1")
+
+# Msbuild 
+Set-Alias MSBuild (Resolve-MSBuild)
 
 
 # make 
