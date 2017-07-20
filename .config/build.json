@@ -1,4 +1,11 @@
 {
+
+  "ProductName": "Conic",
+  "CompanyName": "DenebLab",
+  "Copyright": "Copyright 2017 DenebLab. All rights reserved.",
+  "BuildProjectDirPath": "\\src\\build",
+  "PackagesDir": "\\src\\packages",
+  "Libz": "\\src\\packages\\LibZ.Tool\\tools\\libz.exe",
   "PsGitVersion": {
     "Strategy": "combinateMajorAndBuildSlice3",
     "Major": 1,

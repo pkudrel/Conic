@@ -5,36 +5,44 @@
 
 
 param(
+		
 		$configPath,
 		$scriptsPath,
 		$buildTarget,
 		$buildPath,
 		$buildEnv,
 		$repoPath,
+		$buildDateTime,
 		$conf = (Get-Content $configPath | Out-String | ConvertFrom-Json),
-		$buildVersion = $global:psgitversion,
+		$publishRepoDir = (Join-Path (Split-Path $repoPath -Parent) $conf.PublishRepoSubDir), 
+		$functionRoot = (Join-Path $repoPath "src\SimpleFun"), 
+		$toolsPath,
 		$buildTmpDir = (Join-Path $buildPath "tmp"),
-		$buildDir = (Join-Path $buildTmpDir "build"),
-		$buildExampleDir = (Join-Path $buildTmpDir "build-example"),
-		$buildExampleReadyDir = (Join-Path $buildPath "example"),
-		$buildConicReadyDir = (Join-Path $buildPath "conic"),
-		$margeDir = (Join-Path $buildTmpDir "marge"),
-		$margExampleDir = (Join-Path $buildTmpDir "marge-example"),
+		$projects = ([PSCustomObject]$conf.Projects),
+	    $buildVersion = $global:psgitversion,
+		$buildDir = (Join-Path $buildPath "build"),
+		$margeDir =  (Join-Path $buildPath "marge"),
+		$readyDir =  (Join-Path $buildPath "ready"),
 		$srcDir = (Join-Path  $repoPath $conf.SrcDir),
 		$packagesDir = (Join-Path  $repoPath $conf.PackagesDir),
 		$libz = (Join-Path $repoPath $conf.Libz),
-		$nuget = (Join-Path $repoPath $conf.Nuget),
-		$7zip = (Join-Path $repoPath $conf.Zip),
+		$eventBuilder = (Join-Path $repoPath $conf.EventBuilder),
+		$nuget = (Join-Path $scriptsPath "tools\nuget\nuget.exe"),
 		$gitversion = (Join-Path $repoPath $conf.Gitversion),
-		$currentAssemblyInfo = "AssemblyInfo.cs",
-		$oldAssemblyInfo = "AssemblyInfo.cs.old",
+		$gitBranch,
+		$gitCommitNumber,
+		$buildMiscInfo,
 		$nugetTempDir = (Join-Path $buildTmpDir "nuget-tmp"),
 		$nugetDir = (Join-Path $buildPath "nuget"),
-		$packtDir = (Join-Path $buildPath "pack")
+		$packtDir = (Join-Path $buildPath "pack"),
+		$buildConicReadyDir = (Join-Path $buildPath "conic")
+
     )
 
 # inser tools
-. (Join-Path $scriptsPath "ps\misc.ps1")
+. (Join-Path $scriptsPath "vendor\ps-auto-helpers\ps\misc.ps1")
+. (Join-Path $scriptsPath "vendor\ps-auto-helpers\ps\io.ps1")
+. (Join-Path $scriptsPath "vendor\ps-auto-helpers\ps\assembly-tools.ps1")
 
 use 14.0 MSBuild
 
@@ -42,11 +50,13 @@ use 14.0 MSBuild
 task Clean {
 
 	Write-Host $buildDir
-	Ensure-DirExistsAndIsEmpty $buildDir
+	EnsureDirExistsAndIsEmpty $buildDir
 }
 
 # Synopsis: Download tools if needed
 task Get-Tools {
+
+
 
 	if((Test-Path $nuget) -eq 0)
 	{
@@ -66,20 +76,24 @@ task Get-Tools {
 # Synopsis: Build the project.
 task Build-Conic {
 	Write-Host "Build Conic"
-	$projectFile = Join-Path $repoPath  $conf.ProjectFile
-	Ensure-DirExistsAndIsEmpty $buildDir 
-	Update-AssemblyInfo $srcDir $currentAssemblyInfo $buildVersion.AssemblyVersion $buildVersion.AssemblyFileVersion $buildVersion.AssemblyInformationalVersion $conf.ProductName $conf.CompanyName $conf.Copyright
+	
+	$projectFile = Join-Path $repoPath  "/src/Conic/Conic.csproj"
+	EnsureDirExistsAndIsEmpty $buildDir 
+	$srcWorkDir = Join-Path $repoPath "/src/Conic/"
+	$out =  $buildDir;
+	$out
+	UpdateAssemblyInfo $srcWorkDir $buildVersion.AssemblyVersion $buildVersion.AssemblyFileVersion $buildVersion.AssemblyInformationalVersion $conf.ProductName $conf.CompanyName $conf.Copyright
 
 	try {
-		exec { msbuild $projectFile /t:Build /p:Configuration=$buildTarget /v:quiet /p:OutDir=$buildDir    } 
+		exec { msbuild $projectFile /t:Build /p:Configuration=$buildTarget /v:quiet /p:OutDir=$out     } 
 	}
 	catch {
-		Restore-AssemblyInfo $srcDir $currentAssemblyInfo $oldAssemblyInfo
+		RestoreTemporaryFiles $srcWorkDir
 		throw $_.Exception
 		exit 1
 	}
 	finally {
-		Restore-AssemblyInfo $srcDir $currentAssemblyInfo $oldAssemblyInfo
+		RestoreTemporaryFiles $srcWorkDir
 	}
 
 }
@@ -88,7 +102,7 @@ task Build-Conic {
 task Build-Example {
 	Write-Host "Build Example"
 	$winformProjectFile = Join-Path $repoPath  $conf.WinformProjectFile
-	Ensure-DirExistsAndIsEmpty $buildExampleDir
+	EnsureDirExistsAndIsEmpty $buildExampleDir
 	exec { msbuild $winformProjectFile /t:Build /p:Configuration=$buildTarget /v:quiet /p:OutDir=$buildExampleDir    } 
 }
 
@@ -96,7 +110,8 @@ task Build-Example {
 task Package-Restore-Conic {
 
 	Push-Location  $repoPath
-	$slnFile = Join-Path $repoPath  $conf.SlnFile
+	$slnFile = Join-Path $repoPath  "/src/Conic.sln"
+	$slnFile
 	exec {  &$nuget restore $slnFile  }
 	Pop-Location
 
@@ -116,9 +131,10 @@ task Package-Restore-Example {
 task Marge-Conic  {	
 
 	Write-Host "Marge Conic"
-	$src = $buildDir
+	
+	$src = $buildDir;
 	$dst = $margeDir
-	Ensure-DirExistsAndIsEmpty $dst
+	EnsureDirExistsAndIsEmpty $dst
 	Push-Location  $src
 	& $libz inject-dll --assembly Conic.exe --include *.dll --move
 	Pop-Location
@@ -132,8 +148,10 @@ task Marge-Example  {
 	Write-Host "Marge example"
 	$src = $buildExampleDir
 	$dst = $margExampleDir
-	Ensure-DirExistsAndIsEmpty $dst
+	EnsureDirExistsAndIsEmpty $dst
 	Push-Location  $src
+	
+
 	& $libz inject-dll --assembly Conic.Example.WinForm.exe --include *.dll --move
 	Pop-Location
 	Copy-Item  "$src/Conic.Example.WinForm.exe" -Destination $dst 
@@ -144,18 +162,18 @@ task Marge-Example  {
 task Copy-To-Ready-Example  {	
 
 	$dst = $buildExampleReadyDir
-	Ensure-DirExistsAndIsEmpty $dst
+	EnsureDirExistsAndIsEmpty $dst
 	
 	$winformDir = "$dst/winform"
-	Ensure-DirExistsAndIsEmpty $winformDir
+	EnsureDirExistsAndIsEmpty $winformDir
 	cp  "$margExampleDir/Conic.Example.WinForm.exe" -Destination "$winformDir"
 
 	$extensionDir = "$dst/extension"
-	Ensure-DirExistsAndIsEmpty $extensionDir
+	EnsureDirExistsAndIsEmpty $extensionDir
 	cp  "$repoPath/src/Example/Conic.Example.ChromeExtension/app/*" -Recurse -Destination "$extensionDir"
 
 	$conicDir = "$dst/conic"
-	Ensure-DirExistsAndIsEmpty $conicDir
+	EnsureDirExistsAndIsEmpty $conicDir
 	cp  "$margeDir/Conic.exe" -Destination "$conicDir"
 	cp  "$margeDir/NLog.config" -Destination "$conicDir"
 }
@@ -164,7 +182,7 @@ task Copy-To-Ready-Example  {
 task Copy-To-Ready-Conic  {	
 
 	$dst = $buildConicReadyDir
-	Ensure-DirExistsAndIsEmpty $dst
+	EnsureDirExistsAndIsEmpty $dst
 	cp  "$margeDir/Conic.exe" -Destination "$dst"
 	cp  "$margeDir/NLog.config" -Destination "$dst"
 }
@@ -219,9 +237,9 @@ task Prepare-Conic-Example-To-Work -If ($buildEnv -eq 'local') {
 # Synopsis: Make nuget file
 task Pack-Nuget  {
 
-	Ensure-DirExistsAndIsEmpty $nugetTempDir
-	Ensure-DirExistsAndIsEmpty $nugetDir
-	Ensure-DirExistsAndIsEmpty "$nugetTempDir\tools"
+	EnsureDirExistsAndIsEmpty $nugetTempDir
+	EnsureDirExistsAndIsEmpty $nugetDir
+	EnsureDirExistsAndIsEmpty "$nugetTempDir\tools"
 	
 	$spacFilePath = Join-Path $scriptsPath "nuget\Conic.nuspec"
 	$specFileOutPath = Join-Path $nugetTempDir "Conic.nuspec"
@@ -240,7 +258,7 @@ task Pack-Nuget  {
 # Synopsis: Make zip file.
 task Pack-To-Zip  {
 
-	Ensure-DirExistsAndIsEmpty $packtDir
+	EnsureDirExistsAndIsEmpty $packtDir
 	
 	$src = "$margeDir\Conic.exe"
 	$dst =  "$packtDir\conic.zip"
@@ -249,7 +267,7 @@ task Pack-To-Zip  {
 
 task Pack-To-Zip  {
 
-	Ensure-DirExistsAndIsEmpty $packtDir
+	EnsureDirExistsAndIsEmpty $packtDir
 	
 	$src = "$margeDir\Conic.exe"
 	$dst =  "$packtDir\conic.zip"
@@ -258,7 +276,7 @@ task Pack-To-Zip  {
 
 task Copy-Local -If ($buildEnv -eq 'local')  {
 
-	Ensure-DirExistsAndIsEmpty $packtDir
+	EnsureDirExistsAndIsEmpty $packtDir
 	
 	$src = "$margeDir\Conic.exe"
 	$dst =  "$repoPath\stuff\working-version\"

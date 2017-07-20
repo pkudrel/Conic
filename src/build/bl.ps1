@@ -15,6 +15,7 @@ param(
 		$configPath = (Join-Path $repoPath "\.config\build.json" ),
 		$config = (Get-Content $configPath | Out-String | ConvertFrom-Json),
 		$psGitVersionConfig = ([PSCustomObject]$config.PsGitVersion),
+		$buildVersion,
 		$buildScriptsPath = (Join-Path $scriptsPath  "default.ps1" ),
 		$buildTarget = "Release",
 		$buildEnv = "local",
@@ -28,32 +29,27 @@ param(
 		$buildDateTime = ((Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")),
 		$gitCommitNumber = 0,
 		$gitBranch = "",
-		$ib = (Join-Path $scriptsPath "\tools\ib\Invoke-Build.ps1")
+		$helpersPath = $(If (Test-Path (Join-Path $scriptsPath "vendor\ps-auto-helpers\")) { (Join-Path $scriptsPath "vendor\ps-auto-helpers\") } else { $scriptsPath } ),
+		$ib = (Join-Path $helpersPath "\tools\ib\Invoke-Build.ps1")
     )
 
 $ValueNamesToExport =@("repoPath", "configPath", "scriptsPath",
  "toolsPath", "buildEnv", "buildTarget",  "buildPath","buildNumber", "gitCommitNumber",
- "buildDateTime" , "gitBranch", "buildMiscInfo")
+ "buildDateTime" , "gitBranch", "buildMiscInfo", "buildVersion")
 
-# inser tools
-. (Join-Path $scriptsPath "vendor\ps-auto-helpers\ps\misc.ps1")
-. (Join-Path $scriptsPath "vendor\ps-auto-helpers\ps\io.ps1")
-. (Join-Path $scriptsPath "vendor\ps-auto-helpers\ps\assembly-tools.ps1")
-
-# Msbuild 
-Set-Alias MSBuild (Resolve-MSBuild)
+ # tools
+. (Join-Path $helpersPath "ps\misc.ps1")
+. (Join-Path $helpersPath "ps\psgitversion.ps1")
 
 
 # make 
 
-$bv = Get-GitVersion $psGitVersionStrategy $buildMajor $buildMinor $buildPatch $buildCounter $buildSpecial $buildEnv $gitBranch
-$global:psgitversion = $bv 
+$buildVersion = Get-GitVersion $psGitVersionStrategy $buildMajor $buildMinor $buildPatch $buildCounter $buildSpecial $buildEnv $gitBranch
 
-
-$buildNumber = $bv.BuildCounter
-$gitCommitNumber = $bv.CommitsCounter
-$gitBranch = $bv.BranchName
-$buildMiscInfo = $bv.AssemblyInformationalVersion
+$buildNumber = $buildVersion.BuildCounter
+$gitCommitNumber = $buildVersion.CommitsCounter
+$gitBranch = $buildVersion.BranchName
+$buildMiscInfo = $buildVersion.AssemblyInformationalVersion
 
 
 
@@ -70,10 +66,11 @@ $parmsToExport.GetEnumerator()| Sort-Object -Property name | Format-Table Name, 
 
 try {
         # Invoke the build and keep results in the variable Result
-        & $ib -File $buildScriptsPath -Parameters $parmsToExport -Result Result 
+		& $ib @parmsToExport -File $buildScriptsPath  -Result Result 
     }
 catch {
  Write $Result.Error
+ Write $_
  exit 1 # Failure
 }
 
