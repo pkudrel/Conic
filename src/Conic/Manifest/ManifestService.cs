@@ -33,7 +33,7 @@ namespace Conic.Manifest
         /// <summary>
         /// Update registry if:
         /// - key does not exists
-        /// - hoste name was changed or
+        /// - host name was changed or
         /// - path to manifest file was changed
         /// </summary>
         /// <param name="hostName"></param>
